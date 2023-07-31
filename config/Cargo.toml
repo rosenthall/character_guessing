@@ -1,17 +1,11 @@
 [package]
-name = "project"
+name = "config"
 version = "0.1.0"
 edition = "2021"
-
-[workspace]
-members = [
-    "database",
-    "config"
-]
-
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-database = {path="database/"}
-config = {path="config/"}
+serde = "1.0.179"
+tokio = { version = "1.29.1", features = ["full"] }
+toml = "0.7.6"
