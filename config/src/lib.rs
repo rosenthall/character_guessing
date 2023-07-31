@@ -1,7 +1,7 @@
 mod error;
 use error::ConfigError;
 
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use toml::from_str;
