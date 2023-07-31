@@ -1,6 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use toml;
+use serde::de::Error;
+use std::string::FromUtf8Error;
+use std::fs;
+use std::path::PathBuf;
+use toml::from_str;
+
 
 #[derive(Debug, Serialize, Deserialize)]
 struct TelegramConfig {
@@ -33,28 +38,40 @@ pub struct Config {
     calendar: CalendarConfig,
 }
 
+#[derive(Debug)]
+enum ConfigError {
+    IoError(std::io::Error),
+    TomlError(toml::de::Error),
+    Utf8Error(FromUtf8Error),
+}
+impl From<std::io::Error> for ConfigError {
+    fn from(error: std::io::Error) -> Self {
+        ConfigError::IoError(error)
+    }
+}
+
+impl From<toml::de::Error> for ConfigError {
+    fn from(error: toml::de::Error) -> Self {
+        ConfigError::TomlError(error)
+    }
+}
+
+impl From<FromUtf8Error> for ConfigError {
+    fn from(error: FromUtf8Error) -> Self {
+        ConfigError::Utf8Error(error)
+    }
+}
+
 impl Config {
-    fn try_get_from_current_path() -> Result<Config, Err(e)> {
-        let dir = std::env::current_dir()
-            .expect("Cannot get current dir!");
+    fn load_from_current_path() -> Result<Config, ConfigError> {
+        let dir = std::env::current_dir()?;
+        let mut config_path = PathBuf::from(dir);
+        config_path.push("config.toml");
 
-        let config_path = format!("{}/config.toml", dir.to_str().unwrap());
+        let config_text = fs::read(config_path)?;
+        let config_text = String::from_utf8(config_text)?;
 
-
-        let config_text = std::fs::read(config_path)
-            .expect("Cannot read file in current path!");
-
-        let config_text = String::from_utf8(config_text).unwrap();
-
-        let result = match toml::from_str(config_text) {
-            Ok(toml) => {
-                toml
-            }
-            Err(error) => {
-                panic!("{}", error);
-            }
-            _ => {}
-        };
-
+        let config = from_str(&config_text)?;
+        Ok(config)
     }
 }
