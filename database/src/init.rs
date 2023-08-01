@@ -1,8 +1,12 @@
+use std::error::Error;
 use std::fs;
-use rusqlite::{params, Connection, Result};
+use rusqlite::{params, Connection};
+
+use std::result::Result;
+
 use log::*;
 // Функция для создания новой базы данных и таблицы
-pub fn create_database_and_table(date: &str) -> Result<()> {
+pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
     // Создаем подключение к базе данных
 
     let db_path = format!("databases/{}.db", date);
@@ -10,7 +14,11 @@ pub fn create_database_and_table(date: &str) -> Result<()> {
     info!("Путь к файлу новой базы данных: {}", db_path.clone());
 
 
-    let conn = Connection::open(db_path)?;
+    let conn = Connection::open(db_path).unwrap_or_else(|e| {
+        error!("Error while creating a connction : {e}");
+        panic!();
+
+    });
 
     info!("Создаю новую таблицу в базе!");
     // Создаем таблицу Users
@@ -28,6 +36,6 @@ pub fn create_database_and_table(date: &str) -> Result<()> {
         0
     });
 
-    Ok(())
+    Ok(conn)
 }
 
