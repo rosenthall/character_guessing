@@ -1,5 +1,5 @@
-use std::string::FromUtf8Error;
 use std::io::Error;
+use std::string::FromUtf8Error;
 use toml::de::Error as TomlError;
 
 #[derive(Debug)]

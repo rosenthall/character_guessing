@@ -1,11 +1,11 @@
+#[derive(Debug)]
 pub struct User {
     // Соответствует айди пользователя в телеграме
-    pub id : u32,
+    pub id: u32,
     // Количество попыток
-    attempts : u8,
+    pub attempts: u8,
     // Смог ли он победить(учитываются все попытки)
-    is_won : bool,
+    pub is_won: bool,
     // Количество вопросов
-    questions_quantity : u8,
+    pub questions_quantity: u8,
 }
-
