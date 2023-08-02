@@ -8,34 +8,34 @@ use toml::from_str;
 
 
 #[derive(Debug, Serialize, Deserialize)]
-struct TelegramConfig {
-    telegram_token: String,
-    telegram_allowed_groups: Vec<String>,
-    telegram_admin_ids: Vec<String>,
+pub struct TelegramConfig {
+    pub telegram_token: String,
+    pub telegram_allowed_groups: Vec<String>,
+    pub telegram_admin_ids: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct OpenAIConfig {
-    openai_api_token: String,
+pub struct OpenAIConfig {
+    pub openai_api_token: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct CalendarEntry {
-    date: String,
-    prompt: String,
+pub struct CalendarEntry {
+    pub date: String,
+    pub prompt: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct CalendarConfig {
-    plan: Vec<CalendarEntry>,
+pub struct CalendarConfig {
+    pub plan: Vec<CalendarEntry>,
 }
 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    telegram: TelegramConfig,
-    openai: OpenAIConfig,
-    calendar: CalendarConfig,
+    pub telegram: TelegramConfig,
+    pub openai: OpenAIConfig,
+    pub calendar: CalendarConfig,
 }
 impl Config {
     pub fn load_from_current_path() -> Result<Config, ConfigError> {
