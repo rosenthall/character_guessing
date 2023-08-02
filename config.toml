@@ -1,10 +1,10 @@
 [telegram]
 # Токен телеграм-бота (строка).
-telegram_token = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
+telegram_token = "6403116353:AAF2bkZEtpJNf3XsxNroX0PxzLb6UTSPj2Y"
 # Айди групп в которой он будет работать, белый список (массив из строк).
-telegram_allowed_groups = ["GROUP_ID_1", "GROUP_ID_2", "GROUP_ID_3"]
+telegram_allowed_groups = ["-727035976", "667588148", "GROUP_ID_3"]
 # Айди администраторов бота, белый список (массив из строк).
-telegram_admin_ids = ["ADMIN_ID_1", "ADMIN_ID_2"]
+telegram_admin_ids = ["6261989159", "ADMIN_ID_2"]
 
 [openai]
 openai_api_token = "YOUR_OPENAI_API_TOKEN_HERE"
