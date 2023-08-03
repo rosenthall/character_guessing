@@ -9,7 +9,7 @@ use log::*;
 pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
     // Создаем подключение к базе данных
 
-    let db_path = format!("databases/{}.db", date);
+    let db_path = format!("data/{}.db", date);
 
     info!("Путь к файлу новой базы данных: {}", db_path.clone());
 
