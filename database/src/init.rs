@@ -1,6 +1,4 @@
 use rusqlite::{params, Connection};
-use std::error::Error;
-use std::fs;
 
 use std::result::Result;
 
@@ -31,7 +29,6 @@ pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
     ).unwrap_or_else(|e| {
         error!("Ошибка при создании базы данных : {e:#?}");
         panic!();
-        0
     });
 
     Ok(conn)
