@@ -4,6 +4,7 @@ use error::ConfigError;
 use serde_derive::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
+use lazy_static::lazy_static;
 use toml::from_str;
 
 
@@ -38,7 +39,7 @@ pub struct Config {
     pub calendar: CalendarConfig,
 }
 impl Config {
-    pub fn load_from_current_path() -> Result<Config, ConfigError> {
+    fn load_from_current_path() -> Result<Config, ConfigError> {
         let dir = std::env::current_dir()?;
         let mut config_path = PathBuf::from(dir);
         config_path.push("config.toml");
@@ -49,4 +50,8 @@ impl Config {
         let config = from_str(&config_text)?;
         Ok(config)
     }
+}
+
+lazy_static! {
+    pub static ref CONFIG : Config = Config::load_from_current_path().unwrap();
 }
