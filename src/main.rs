@@ -3,7 +3,8 @@ use log::info;
 use pretty_env_logger::env_logger;
 
 use chrono::prelude::*;
-use database::model::User;
+use config::CONFIG;
+
 
 #[tokio::main]
 async fn main() {
@@ -21,7 +22,10 @@ async fn main() {
     info!("Current date : {formatted_date}");
 
     //Создаем базу данных с названием на основе сегодняшней даты
-    let db_connection = database::init::create_database_and_table(formatted_date.as_str()).unwrap();
+    //let db_connection = database::init::create_database_and_table(formatted_date.as_str()).unwrap();
+
+    //Запускаем телеграм бота и передаем ему TelegramConfig.
+    telegram::start_bot(&CONFIG.telegram).await;
 
 
 }

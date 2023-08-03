@@ -1,14 +1,18 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+mod commands;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use log::info;
+use commands::*;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+use teloxide::prelude::*;
+
+use config::TelegramConfig;
+
+pub async fn start_bot(cfg : &TelegramConfig) {
+    let bot = Bot::new(&cfg.telegram_token);
+
+    info!("Bot started as : {:?}", bot.get_me().await.unwrap());
+
+
+    let _ = Command::repl(bot, handle_command).await;
+
 }
