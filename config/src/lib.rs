@@ -8,31 +8,31 @@ use lazy_static::lazy_static;
 use toml::from_str;
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TelegramConfig {
     pub telegram_token: String,
     pub telegram_allowed_groups: Vec<String>,
     pub telegram_admin_ids: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OpenAIConfig {
     pub openai_api_token: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CalendarEntry {
     pub date: String,
     pub prompt: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CalendarConfig {
     pub plan: Vec<CalendarEntry>,
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     pub telegram: TelegramConfig,
     pub openai: OpenAIConfig,
