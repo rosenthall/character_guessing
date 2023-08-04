@@ -51,5 +51,5 @@ pub async fn question(question : String) -> String {
     info!("Ответ от openai api : {:#?}", response);
 
 
-    response.object
+    response.choices[0].message.content.clone().unwrap()
 }

@@ -1,6 +1,6 @@
 use log::{info};
 use teloxide::Bot;
-use teloxide::prelude::{Message, ResponseResult};
+use teloxide::prelude::{Message, Requester, ResponseResult};
 use teloxide_macros::BotCommands;
 use config::CONFIG;
 
@@ -43,11 +43,21 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             Command::Answer(_) => {
                 todo!();
             }
-            Command::Question(_) => {
-                todo!();
+            Command::Question(cmd) => {
+                info!("CMD : {cmd}");
+
+                let ai_answer = openai::question(cmd).await;
+
+                info!("AI ANSWER : {}", ai_answer.clone());
+
+                bot.send_message(msg.chat.id, ai_answer)
+                    .await;
+
+
+                Ok(())
             }
         }
     } else {
         return Ok(())
-    };
+    }
 }
