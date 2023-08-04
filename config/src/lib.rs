@@ -6,7 +6,7 @@ use std::fs;
 use std::path::PathBuf;
 use lazy_static::lazy_static;
 use toml::from_str;
-
+use chrono::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TelegramConfig {
@@ -30,7 +30,27 @@ pub struct CalendarEntry {
 pub struct CalendarConfig {
     pub plan: Vec<CalendarEntry>,
 }
+impl CalendarConfig {
+    pub fn try_get_daily_prompt(&self) -> Result<String, ()> {
 
+        let formatted_date = {
+            let utc_now: DateTime<Utc> = Utc::now();
+            let date = utc_now.date_naive();
+
+            date.format("%y-%m-%d").to_string()
+        };
+
+
+        for entry in &self.plan {
+            if entry.date == formatted_date {
+                return Ok(entry.prompt.clone());
+            }
+        }
+
+        Err(())
+
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
