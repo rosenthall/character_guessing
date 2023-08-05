@@ -1,12 +1,12 @@
 mod error;
 use error::ConfigError;
 
+use chrono::prelude::*;
+use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use lazy_static::lazy_static;
 use toml::from_str;
-use chrono::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TelegramConfig {
@@ -18,8 +18,8 @@ pub struct TelegramConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OpenAIConfig {
     pub openai_api_token: String,
-    pub tokens_per_request_limit : u32,
-    pub default_prompt_template : String
+    pub tokens_per_request_limit: u32,
+    pub default_prompt_template: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -34,14 +34,12 @@ pub struct CalendarConfig {
 }
 impl CalendarConfig {
     pub fn try_get_daily_character(&self) -> Result<String, ()> {
-
         let formatted_date = {
             let utc_now: DateTime<Utc> = Utc::now();
             let date = utc_now.date_naive();
 
             date.format("%y-%m-%d").to_string()
         };
-
 
         for entry in &self.plan {
             if entry.date == formatted_date {
@@ -50,7 +48,6 @@ impl CalendarConfig {
         }
 
         Err(())
-
     }
 }
 
@@ -75,5 +72,5 @@ impl Config {
 }
 
 lazy_static! {
-    pub static ref CONFIG : Config = Config::load_from_current_path().unwrap();
+    pub static ref CONFIG: Config = Config::load_from_current_path().unwrap();
 }

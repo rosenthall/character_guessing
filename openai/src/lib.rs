@@ -2,24 +2,30 @@ use config::CONFIG;
 
 use log::*;
 
-use async_openai::{Client, config::OpenAIConfig};
-use async_openai::types::{ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role};
+use async_openai::types::{
+    ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role,
+};
+use async_openai::{config::OpenAIConfig, Client};
 
-
-pub async fn question(question : String) -> String {
-
-    let config = OpenAIConfig::new()
-        .with_api_key(CONFIG.clone().openai.openai_api_token);
+pub async fn question(question: String) -> String {
+    let config = OpenAIConfig::new().with_api_key(CONFIG.clone().openai.openai_api_token);
 
     // Получаем промпт для роли "ChatGPT" из конфигурации
-    let chatgpt_prompt = format!("{} {}", CONFIG.clone().openai.default_prompt_template, CONFIG.calendar.try_get_daily_character().unwrap());
+    let chatgpt_prompt = format!(
+        "{} {}",
+        CONFIG.clone().openai.default_prompt_template,
+        CONFIG.calendar.try_get_daily_character().unwrap()
+    );
     dbg!(chatgpt_prompt.clone());
     // Получаем максимальное количество токенов на один запрос к openai
     let token_limit = CONFIG.openai.clone().tokens_per_request_limit;
 
     // Получаем промпт для вопроса от пользователя (аргумент функции)
     let user_prompt = question;
-    info!("Получен новый запрос от пользователя : {}", &user_prompt.clone());
+    info!(
+        "Получен новый запрос от пользователя : {}",
+        &user_prompt.clone()
+    );
 
     // Создаем клиента для работы с OpenAI API
     let client = Client::with_config(config);
@@ -49,10 +55,8 @@ pub async fn question(question : String) -> String {
         ])
         .build().unwrap();
 
-
     let response = client.chat().create(request).await.unwrap();
     info!("Ответ от openai api : {:#?}", response);
-
 
     response.choices[0].message.content.clone().unwrap()
 }

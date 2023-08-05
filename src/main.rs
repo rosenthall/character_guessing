@@ -5,7 +5,6 @@ use pretty_env_logger::env_logger;
 use chrono::prelude::*;
 use config::CONFIG;
 
-
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -26,6 +25,4 @@ async fn main() {
 
     //Запускаем телеграм бота и передаем ему TelegramConfig.
     telegram::start_bot(&CONFIG.telegram).await;
-
-
 }

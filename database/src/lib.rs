@@ -1,6 +1,6 @@
+pub mod control;
 mod init;
 pub mod model;
-pub mod control;
 
 use model::User;
 
@@ -52,7 +52,8 @@ pub fn try_add_user(user: User, con: &Connection) -> Result<(), Box<dyn Error>> 
             user.is_won,
             user.questions_quantity,
         ],
-    ).unwrap_or_else(|e|{
+    )
+    .unwrap_or_else(|e| {
         error!("Ошибка во время подготовки query : {e}");
         panic!();
     });
@@ -60,35 +61,57 @@ pub fn try_add_user(user: User, con: &Connection) -> Result<(), Box<dyn Error>> 
     Ok(())
 }
 
+pub fn update_attempts(
+    connection: &Connection,
+    user_id: u64,
+    attempts: u8,
+) -> Result<(), &'static dyn Error> {
+    trace!(
+        "Изменяю количество попыток для пользователя : {}, новое значение : {}",
+        user_id.clone(),
+        attempts.clone()
+    );
 
-
-
-pub fn update_attempts(connection: &Connection, user_id: u64, attempts: u8) -> Result<(), &'static dyn Error> {
-
-    trace!("Изменяю количество попыток для пользователя : {}, новое значение : {}", user_id.clone(), attempts.clone());
-
-    connection.execute(
-        "UPDATE users SET attempts = ?1 WHERE id = ?2",
-        [attempts as i64, user_id as i64],
-    ).unwrap();
+    connection
+        .execute(
+            "UPDATE users SET attempts = ?1 WHERE id = ?2",
+            [attempts as i64, user_id as i64],
+        )
+        .unwrap();
     Ok(())
 }
 
 // Функция для обновления значения поля "is_won" в базе данных
-pub fn update_is_won(connection: &Connection, user_id: u64, is_won: bool) -> Result<(), &'static dyn Error>{
-    connection.execute(
-        "UPDATE users SET is_won = ?1 WHERE id = ?2",
-        [is_won as i64, user_id as i64],
-    ).unwrap();
+pub fn update_is_won(
+    connection: &Connection,
+    user_id: u64,
+    is_won: bool,
+) -> Result<(), &'static dyn Error> {
+    connection
+        .execute(
+            "UPDATE users SET is_won = ?1 WHERE id = ?2",
+            [is_won as i64, user_id as i64],
+        )
+        .unwrap();
     Ok(())
 }
 
 // Функция для обновления значения поля "questions_quantity" в базе данных
-pub fn update_questions_quantity(connection: &Connection, user_id: u64, questions_quantity: u8) -> Result<(), &'static dyn Error> {
-    trace!("Изменяю количество заданных вопросов для пользователя : {}, новое значение : {}", user_id.clone(), user_id.clone());
-    connection.execute(
-        "UPDATE users SET questions_quantity = ?1 WHERE id = ?2",
-        [questions_quantity as i64, user_id as i64],
-    ).unwrap();
+pub fn update_questions_quantity(
+    connection: &Connection,
+    user_id: u64,
+    questions_quantity: u8,
+) -> Result<(), &'static dyn Error> {
+    trace!(
+        "Изменяю количество заданных вопросов для пользователя : {}, новое значение : {}",
+        user_id.clone(),
+        user_id.clone()
+    );
+    connection
+        .execute(
+            "UPDATE users SET questions_quantity = ?1 WHERE id = ?2",
+            [questions_quantity as i64, user_id as i64],
+        )
+        .unwrap();
     Ok(())
 }
