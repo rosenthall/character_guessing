@@ -85,7 +85,7 @@ pub fn update_is_won(connection: &Connection, user_id: u64, is_won: bool) -> Res
 
 // Функция для обновления значения поля "questions_quantity" в базе данных
 pub fn update_questions_quantity(connection: &Connection, user_id: u64, questions_quantity: u8) -> Result<(), &'static dyn Error> {
-    trace!("Изменяю количество заданных вопросов для пользователя : {}, новое значение : {}", user_id.clone(), attempts.clone());
+    trace!("Изменяю количество заданных вопросов для пользователя : {}, новое значение : {}", user_id.clone(), user_id.clone());
     connection.execute(
         "UPDATE users SET questions_quantity = ?1 WHERE id = ?2",
         [questions_quantity as i64, user_id as i64],
