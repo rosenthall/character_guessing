@@ -1,5 +1,6 @@
-pub mod init;
+mod init;
 pub mod model;
+pub mod control;
 
 use model::User;
 
