@@ -40,8 +40,14 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
     if is_chat_in_whitelist {
 
         match cmd {
-            Command::Answer(_) => {
-                todo!();
+            Command::Answer(cmd) => {
+
+                if cmd == CONFIG.calendar.try_get_daily_character().unwrap() {
+                    bot.send_message(msg.chat.id, "Да - это именно я, ты победил!")
+                        .await;
+                };
+
+                Ok(())
             }
             Command::Question(cmd) => {
                 info!("CMD : {cmd}");

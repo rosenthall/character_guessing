@@ -12,7 +12,10 @@ pub async fn question(question : String) -> String {
         .with_api_key(CONFIG.clone().openai.openai_api_token);
 
     // Получаем промпт для роли "ChatGPT" из конфигурации
-    let chatgpt_prompt = CONFIG.calendar.try_get_daily_prompt().unwrap();
+    let chatgpt_prompt = format!("{} {}", CONFIG.clone().openai.default_prompt_template, CONFIG.calendar.try_get_daily_character().unwrap());
+    dbg!(chatgpt_prompt.clone());
+    // Получаем максимальное количество токенов на один запрос к openai
+    let token_limit = CONFIG.openai.clone().tokens_per_request_limit;
 
     // Получаем промпт для вопроса от пользователя (аргумент функции)
     let user_prompt = question;
@@ -23,13 +26,13 @@ pub async fn question(question : String) -> String {
 
     // Формируем запрос на создание чат-подобной модели с указанными ролями и сообщениями
     let request = CreateChatCompletionRequestArgs::default()
-        .max_tokens(192_u16)
+        .max_tokens(token_limit as u16)
         .model("gpt-3.5-turbo")
         .messages([
             // Сообщение с ролью "System" для установки контекста ассистента
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::System)
-                .content("You are a historical character.You're trying to hide your name.")
+                .content("You are a historical character.You're trying to hide your name. You are responding only in russian.")
                 .build().unwrap(),
 
             // Сообщение с ролью "ChatGPT" и содержанием промпта для ChatGPT

@@ -18,12 +18,14 @@ pub struct TelegramConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OpenAIConfig {
     pub openai_api_token: String,
+    pub tokens_per_request_limit : u32,
+    pub default_prompt_template : String
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CalendarEntry {
     pub date: String,
-    pub prompt: String,
+    pub character: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -31,7 +33,7 @@ pub struct CalendarConfig {
     pub plan: Vec<CalendarEntry>,
 }
 impl CalendarConfig {
-    pub fn try_get_daily_prompt(&self) -> Result<String, ()> {
+    pub fn try_get_daily_character(&self) -> Result<String, ()> {
 
         let formatted_date = {
             let utc_now: DateTime<Utc> = Utc::now();
@@ -43,7 +45,7 @@ impl CalendarConfig {
 
         for entry in &self.plan {
             if entry.date == formatted_date {
-                return Ok(entry.prompt.clone());
+                return Ok(entry.character.clone());
             }
         }
 
