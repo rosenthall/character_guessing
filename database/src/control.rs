@@ -18,7 +18,7 @@ lazy_static! {
 
         Arc::new(Mutex::new(con))
     };
-};
+}
 
 impl DATABASE {
     // Функция для получения соединения (async)
