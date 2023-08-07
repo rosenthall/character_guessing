@@ -4,7 +4,7 @@ use database::*;
 use log::{info, trace};
 use teloxide::prelude::*;
 use teloxide::Bot;
-use teloxide::payloads::{SendVenueSetters, SendMessageSetters};
+use teloxide::payloads::{SendMessageSetters};
 
 use teloxide_macros::BotCommands;
 
@@ -72,7 +72,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
             bot.delete_message(msg.chat.id, msg.id).await.unwrap();
 
             if user.is_won {
-                bot.send_message(msg.chat.id, "Ты уже победил сегодня!")
+                let _ = bot.send_message(msg.chat.id, "Ты уже победил сегодня!")
                     .reply_to_message_id(msg.id)
                     .await;
             }
@@ -91,7 +91,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
             let character_names = CONFIG.calendar.try_get_daily_character_names().unwrap();
 
             if character_names.contains(&cmd) {
-                bot.send_message(
+                let _ = bot.send_message(
                     msg.chat.id,
                     format!(
                         "Пользователь {} отгадал сегодняшнего персонажа!",
@@ -102,7 +102,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
 
                 update_is_won(&con, user.id, true).unwrap()
             } else {
-                bot.send_message(msg.chat.id, "Вам не удалось угадать персонажа!")
+                let _ = bot.send_message(msg.chat.id, "Вам не удалось угадать персонажа!")
                     .await;
             };
 
@@ -127,7 +127,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
             let ai_answer = openai::question(cmd).await;
             info!("AI ANSWER : {}", ai_answer.clone());
 
-            bot.send_message(msg.chat.id, ai_answer).reply_to_message_id(msg.id).await;
+            let _ = bot.send_message(msg.chat.id, ai_answer).reply_to_message_id(msg.id).await;
 
            //Увеличиваем количество заданных вопросов на 1
             trace!(

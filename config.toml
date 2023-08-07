@@ -15,7 +15,5 @@ default_prompt_template = "Become a historical character (name given at the end)
 # Содержит хешкарту с ключем в виде даты и персонажем ввиде строки.
 [calendar]
 plan = [
-    { date = "23-08-05", character = "Elon Musk" },
-    { date = "23-08-06", character = "Sergey Mavrodi" },
-    { date = "23-08-07", character = "Dwayne Douglas Johnson" },
+    { date = "23-08-07", character = ["Segey Mavrodi", "Mavrodi Sergey", "Сергей Мавроди", "Мавроди Сергей"] },
 ]

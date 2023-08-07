@@ -1,4 +1,3 @@
-use database;
 use log::info;
 use pretty_env_logger::env_logger;
 
