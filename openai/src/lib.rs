@@ -11,10 +11,12 @@ pub async fn question(question: String) -> String {
     let config = OpenAIConfig::new().with_api_key(CONFIG.clone().openai.openai_api_token);
 
     // Получаем промпт для роли "ChatGPT" из конфигурации
+
+    let character_names = CONFIG.calendar.try_get_daily_character_names().unwrap();
     let chatgpt_prompt = format!(
         "{} {}",
         CONFIG.clone().openai.default_prompt_template,
-        CONFIG.calendar.try_get_daily_character().unwrap()
+        character_names[0]
     );
     dbg!(chatgpt_prompt.clone());
     // Получаем максимальное количество токенов на один запрос к openai

@@ -88,14 +88,16 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                 return Ok(());
             }
 
-            if cmd == CONFIG.calendar.try_get_daily_character().unwrap() {
+            let character_names = CONFIG.calendar.try_get_daily_character_names().unwrap();
+
+            if character_names.contains(&cmd) {
                 bot.send_message(
                     msg.chat.id,
                     format!(
-                        "Да, {}, это именно я, ты победил!",
+                        "Пользователь {} отгадал сегодняшнего персонажа!",
                         author.mention().unwrap_or(author.clone().first_name)
                     ),
-                ).reply_to_message_id(msg.id)
+                )
                 .await;
 
                 update_is_won(&con, user.id, true).unwrap()

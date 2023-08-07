@@ -25,7 +25,7 @@ pub struct OpenAIConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CalendarEntry {
     pub date: String,
-    pub character: String,
+    pub character: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -33,7 +33,7 @@ pub struct CalendarConfig {
     pub plan: Vec<CalendarEntry>,
 }
 impl CalendarConfig {
-    pub fn try_get_daily_character(&self) -> Result<String, ()> {
+    pub fn try_get_daily_character_names(&self) -> Result<Vec<String>, ()> {
         let formatted_date = {
             let utc_now: DateTime<Utc> = Utc::now();
             let date = utc_now.date_naive();
