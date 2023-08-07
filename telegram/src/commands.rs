@@ -3,8 +3,9 @@ use database::model::User;
 use database::*;
 use log::{info, trace};
 use teloxide::prelude::*;
-use teloxide::Bot;
-use teloxide::payloads::{SendMessageSetters};
+use teloxide::{Bot};
+use teloxide::payloads::{GetChatMember, SendMessageSetters};
+use teloxide::requests::JsonRequest;
 
 use teloxide_macros::BotCommands;
 
@@ -19,6 +20,9 @@ pub enum Command {
 
     #[command(description = "Ask a question of today's character.")]
     Question(String),
+
+    #[command(description = "Get a list of today's winners(admins only).")]
+    Winners,
 }
 
 pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseResult<()> {
@@ -56,9 +60,8 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
             },
             &con,
         )
-        .unwrap()
+            .unwrap()
     }
-
     // Переинициализируем user, на этот раз с unwrap, ибо он должен существовать на этом этапе
     let user = check_user(author.id.0, &con).unwrap();
 
@@ -83,8 +86,8 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                     "Извини, но ты уже задал свои 3 вопроса сегодня!\
                 Возвращайся завтра и попробуй угадать следуйщего персонажа.",
                 ).reply_to_message_id(msg.id)
-                .await
-                .unwrap();
+                    .await
+                    .unwrap();
                 return Ok(());
             }
 
@@ -98,7 +101,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                         author.mention().unwrap_or(author.clone().first_name)
                     ),
                 )
-                .await;
+                    .await;
 
                 update_is_won(&con, user.id, true).unwrap()
             } else {
@@ -119,8 +122,8 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                     "Извини, но ты уже задал свои 3 вопроса сегодня!\
                 Возвращайся завтра и попробуй угадать следуйщего персонажа.",
                 ).reply_to_message_id(msg.id)
-                .await
-                .unwrap();
+                    .await
+                    .unwrap();
                 return Ok(());
             }
 
@@ -129,12 +132,48 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
 
             let _ = bot.send_message(msg.chat.id, ai_answer).reply_to_message_id(msg.id).await;
 
-           //Увеличиваем количество заданных вопросов на 1
+            //Увеличиваем количество заданных вопросов на 1
             trace!(
                 "Увеличенно количество заданных вопросов на 1 для пользователя : {}",
                 user.id
             );
             update_questions_quantity(&con, user.id, user.questions_quantity + 1).unwrap();
+            Ok(())
+        }
+
+        Command::Winners => {
+
+            //If user id is not in admin list - Do nothing
+            if !CONFIG.clone().telegram.telegram_admin_ids.contains(&author.id.0.to_string()) {
+                trace!("User {} is not in admin list!", &author.id.0.to_string());
+                return Ok(());
+            }
+
+            let mut message: String = String::from("Вот люди которые справились с угадыванием сегодняшнего персонажа : \n ");
+            let winners_list = {
+                let mut users = vec!();
+                let requests = database::get_winning_user_ids(&con).unwrap()
+                    .iter()
+                    .map(|i| UserId(*i))
+                    .map(|i| bot.get_chat_member(msg.chat.id, i))
+                    .collect::<Vec<JsonRequest<GetChatMember>>>();
+
+                for request in requests {
+                    let member = request.await.unwrap();
+                    users.push(member.user);
+                }
+
+                users
+            };
+
+
+            for winner in winners_list {
+                message.insert_str(message.len(),&format!("{} ", &winner.mention().or(Some(winner.first_name)).unwrap()));
+            }
+
+            let _ = bot.send_message(msg.chat.id, message).reply_to_message_id(msg.id).await;
+
+
             Ok(())
         }
     }

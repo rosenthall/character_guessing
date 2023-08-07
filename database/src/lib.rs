@@ -39,6 +39,16 @@ pub fn check_user(id: u64, con: &Connection) -> Option<model::User> {
     }
 }
 
+pub fn get_winning_user_ids(conn: &Connection) -> Option<Vec<u64>> {
+    let mut query = conn.prepare("SELECT ID FROM Users WHERE is_won = 1").unwrap();
+    let user_ids = query
+        .query_map([], |row| row.get(0)).unwrap()
+        .filter_map(Result::ok)
+        .collect();
+
+    Some(user_ids)
+}
+
 // Функция добавляет пользователя в базу данных, в случае ошибки - возвращает Err()
 pub fn try_add_user(user: User, con: &Connection) -> Result<(), Box<dyn Error>> {
     let query = "INSERT INTO Users (ID, attempts, is_won, questions_quantity) VALUES (?, ?, ?, ?)";
