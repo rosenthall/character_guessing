@@ -2,8 +2,10 @@ use config::CONFIG;
 use database::model::User;
 use database::*;
 use log::{info, trace};
-use teloxide::prelude::{Message, Requester, ResponseResult};
+use teloxide::prelude::*;
 use teloxide::Bot;
+use teloxide::payloads::{SendVenueSetters, SendMessageSetters};
+
 use teloxide_macros::BotCommands;
 
 #[derive(BotCommands, Clone)]
@@ -19,7 +21,7 @@ pub enum Command {
     Question(String),
 }
 
-pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
+pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseResult<()> {
     info!("Got new command in group : {}", msg.chat.clone().id.0);
 
     // Проверяем есть ли эта группа в вайтлисте
@@ -71,6 +73,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
 
             if user.is_won {
                 bot.send_message(msg.chat.id, "Ты уже победил сегодня!")
+                    .reply_to_message_id(msg.id)
                     .await;
             }
             //Если человек попытался угадать больше 5 раз - отказываем.
@@ -79,7 +82,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
                     msg.chat.id,
                     "Извини, но ты уже задал свои 3 вопроса сегодня!\
                 Возвращайся завтра и попробуй угадать следуйщего персонажа.",
-                )
+                ).reply_to_message_id(msg.id)
                 .await
                 .unwrap();
                 return Ok(());
@@ -92,7 +95,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
                         "Да, {}, это именно я, ты победил!",
                         author.mention().unwrap_or(author.clone().first_name)
                     ),
-                )
+                ).reply_to_message_id(msg.id)
                 .await;
 
                 update_is_won(&con, user.id, true).unwrap()
@@ -113,7 +116,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
                     msg.chat.id,
                     "Извини, но ты уже задал свои 3 вопроса сегодня!\
                 Возвращайся завтра и попробуй угадать следуйщего персонажа.",
-                )
+                ).reply_to_message_id(msg.id)
                 .await
                 .unwrap();
                 return Ok(());
@@ -122,9 +125,9 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             let ai_answer = openai::question(cmd).await;
             info!("AI ANSWER : {}", ai_answer.clone());
 
-            bot.send_message(msg.chat.id, ai_answer).await;
+            bot.send_message(msg.chat.id, ai_answer).reply_to_message_id(msg.id).await;
 
-            //Увеличиваем количество заданных вопросов на 1
+           //Увеличиваем количество заданных вопросов на 1
             trace!(
                 "Увеличенно количество заданных вопросов на 1 для пользователя : {}",
                 user.id
