@@ -4,6 +4,8 @@ use pretty_env_logger::env_logger;
 use chrono::prelude::*;
 use config::CONFIG;
 
+use database::init::update_db_each_day_service;
+
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -19,9 +21,17 @@ async fn main() {
 
     info!("Current date : {formatted_date}");
 
-    //Создаем базу данных с названием на основе сегодняшней даты
-    //let db_connection = database::init::create_database_and_table(formatted_date.as_str()).unwrap();
+    //Handle сервиса для обновления баз данных в отдельном треде
+    let db_updating_handle = tokio::spawn(async move {
+        update_db_each_day_service().await;
+    });
 
-    //Запускаем телеграм бота и передаем ему TelegramConfig.
-    telegram::start_bot(&CONFIG.telegram).await;
+
+    //handle для запуска телеграм бота.
+    let telegram_handle = tokio::spawn(async move {
+        telegram::start_bot(&CONFIG.telegram).await;
+    });
+
+    telegram_handle.await.unwrap();
+    db_updating_handle.await.unwrap();
 }

@@ -11,8 +11,8 @@ use teloxide_macros::BotCommands;
 
 #[derive(BotCommands, Clone)]
 #[command(
-    rename_rule = "lowercase",
-    description = "These commands are supported:"
+rename_rule = "lowercase",
+description = "These commands are supported:"
 )]
 pub enum Command {
     #[command(description = "Assume today's character.")]
@@ -40,8 +40,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
     let is_chat_in_whitelist = allowed_groups.contains(&msg.chat.clone().id.0);
 
     //Создаем инстанс подключения к базе данных
-    let con = database::control::DATABASE.try_get_connection().await;
-
+    let con = database::control::DATABASE_HANDLER.lock().await;
     //Проверяем есть ли этот пользователь в базе данных
     let author = msg.from().unwrap();
     let user = check_user(author.id.0, &con);
