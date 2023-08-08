@@ -115,7 +115,7 @@ pub fn update_questions_quantity(
     trace!(
         "Изменяю количество заданных вопросов для пользователя : {}, новое значение : {}",
         user_id.clone(),
-        user_id.clone()
+        questions_quantity.clone()
     );
     connection
         .execute(
