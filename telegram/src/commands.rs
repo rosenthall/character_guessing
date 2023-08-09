@@ -9,7 +9,7 @@ use teloxide::requests::JsonRequest;
 
 use teloxide_macros::BotCommands;
 
-#[derive(BotCommands, Clone)]
+#[derive(BotCommands, Clone, Debug)]
 #[command(
 rename_rule = "lowercase",
 description = "These commands are supported:"
@@ -23,6 +23,9 @@ pub enum Command {
 
     #[command(description = "Get a list of today's winners(admins only).")]
     Winners,
+
+    #[command(description = "Just information about the game")]
+    Info
 }
 
 pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseResult<()> {
@@ -38,7 +41,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         .collect::<Vec<i64>>();
 
     let is_chat_in_whitelist = allowed_groups.contains(&msg.chat.clone().id.0);
-
+    info!("Group {} is in whitelist : {}", msg.chat.clone().id.0, is_chat_in_whitelist.clone());
     //Создаем инстанс подключения к базе данных
     let con = database::control::DATABASE_HANDLER.lock().await;
     //Проверяем есть ли этот пользователь в базе данных
@@ -112,7 +115,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         }
 
         Command::Question(cmd) => {
-            info!("CMD : {cmd}");
+            info!("New question : {cmd}");
 
             //Если человек уже задал больше трех вопросов - отказываем.
             if user.questions_quantity >= 3 {
@@ -175,5 +178,12 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
 
             Ok(())
         }
+        Command::Info => {
+            let _ = bot.send_message(msg.chat.id, "Вот ссылка на мануал : https://telegra.ph/Kak-polzovatsya-botom-08-09").reply_to_message_id(msg.id).await;
+
+            Ok(())
+        }
+
+
     }
 }
