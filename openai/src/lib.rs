@@ -40,7 +40,7 @@ pub async fn question(question: String) -> String {
             // Сообщение с ролью "System" для установки контекста ассистента
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::System)
-                .content("You are a historical character.You're trying to hide your name. You are responding only in russian.")
+                .content("You are a historical character.You're trying to hide your name. You are responding in the language in which you're being asked..")
                 .build().unwrap(),
 
             // Сообщение с ролью "ChatGPT" и содержанием промпта для ChatGPT
