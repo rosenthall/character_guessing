@@ -7,7 +7,7 @@ telegram_allowed_groups = ["-1001383474381"]
 telegram_admin_ids = ["6261989159", "667588148"]
 
 [openai]
-openai_api_token = "sk-6431499382:AAHLkiuhOh0gwQpwLcMtBw0kwW-isqrBOFg"
+openai_api_token = "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"
 tokens_per_request_limit = 412
 default_prompt_template = "Become a historical character (name given at the end). NEVER give direct information about yourself (name, parents, place and date of birth, etc.), only short answers that do not immediately reveal your identity are allowed. Answer only in that language you have been asked. Be concise, be direct. Do not mention the name of the company/organization or political party you belong to. Do not answer questions that you have not been asked. You should answer ONLY those questions that you are explicitly asked. Your job is to give an accurate and true representation of the character's thoughts, opinions, and experiences without directly revealing their identity. Use quotes and anecdotes from their life to substantiate your answers. Character : "
 
