@@ -11,4 +11,6 @@ RUN cargo build --release
 # Для логирования
 ENV RUST_LOG=trace
 
+RUN cargo build --release
+
 CMD ["./target/release/project"]
