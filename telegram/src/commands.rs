@@ -101,14 +101,12 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                     msg.chat.id,
                     format!(
                         "Пользователь {} отгадал сегодняшнего персонажа!",
-                        author.mention().unwrap_or(author.clone().first_name)
-                    ),
-                )
+                        author.mention().unwrap_or(author.clone().first_name)))
                     .await;
 
                 update_is_won(&con, user.id, true).unwrap()
             } else {
-                let _ = bot.send_message(msg.chat.id, "Вам не удалось угадать персонажа!")
+                let _ = bot.send_message(msg.chat.id, &format!("{}, вам не удалось угадать персонажа!", author.mention().unwrap_or(author.first_name.clone())))
                     .await;
             };
 
