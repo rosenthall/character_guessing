@@ -33,7 +33,7 @@ pub async fn execute(ctx : CommandContext<'_>) -> Result<(), ()> {
 
 
     for winner in winners_list {
-        message.insert_str(message.len(),&format!("{} ", &winner.mention().or(Some(winner.first_name)).unwrap()));
+        message.insert_str(message.len(),&format!("{} ", &winner.mention().unwrap_or(winner.first_name)));
     }
 
     let _ = ctx.bot.send_message(ctx.msg.chat.id, message).reply_to_message_id(ctx.msg.id).await;

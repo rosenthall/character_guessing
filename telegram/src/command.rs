@@ -107,7 +107,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         msg: msg.clone(),
         command_content: "".to_string(),
         bot: &bot,
-        con: con,
+        con,
     };
 
 
@@ -124,7 +124,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                 ..context
             };
 
-            let _ = crate::commands::answer::execute(context).await.unwrap();
+            crate::commands::answer::execute(context).await.unwrap();
 
             Ok(())
         }
@@ -138,21 +138,21 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
             };
 
 
-            let _ = crate::commands::question::execute(context).await.unwrap();
+            crate::commands::question::execute(context).await.unwrap();
 
             Ok(())
         }
 
 
         Command::Winners => {
-            let _ = crate::commands::winners::execute(context).await.unwrap();
+            crate::commands::winners::execute(context).await.unwrap();
 
             Ok(())
         },
 
 
         Command::Info => {
-            let _ = crate::commands::info::execute(context).await.unwrap();
+            crate::commands::info::execute(context).await.unwrap();
 
             Ok(())
         },
