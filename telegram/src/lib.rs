@@ -1,6 +1,12 @@
+// command module contains some abstraction to make commands creation easier
+mod command;
+
+// commands module
 mod commands;
 
-use commands::*;
+
+
+use command::*;
 use log::info;
 
 use teloxide::prelude::*;

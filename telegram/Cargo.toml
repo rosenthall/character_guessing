@@ -13,3 +13,4 @@ tokio = { version = "1.29.1", features = ["full"] }
 config = {path = "../config"}
 openai = {path = "../openai"}
 database = {path = "../database"}
+rusqlite = "0.29.0"
