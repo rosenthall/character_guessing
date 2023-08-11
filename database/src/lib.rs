@@ -2,7 +2,7 @@ pub mod control;
 pub mod init;
 pub mod model;
 
-use model::User;
+use model::UserDbEntry;
 
 use std::error::Error;
 use std::result::Result;
@@ -11,7 +11,7 @@ use log::{error, trace};
 use rusqlite::{params, Connection};
 
 // Если пользователь есть в актуальной дб - возвращает структуру User, в противном случае возвращает None
-pub fn check_user(id: u64, con: &Connection) -> Option<model::User> {
+pub fn check_user(id: u64, con: &Connection) -> Option<model::UserDbEntry> {
     let query = "SELECT ID, attempts, is_won, questions_quantity FROM Users WHERE ID = ?";
     let id = id as i64;
 
@@ -21,7 +21,7 @@ pub fn check_user(id: u64, con: &Connection) -> Option<model::User> {
     });
 
     let result = stmt.query_row(params![id], |row| {
-        Ok(User {
+        Ok(UserDbEntry {
             id: row.get(0).expect("Failed to get ID"),
             attempts: row.get(1).expect("Failed to get attempts"),
             is_won: row.get(2).expect("Failed to get is_won"),
@@ -50,7 +50,7 @@ pub fn get_winning_user_ids(conn: &Connection) -> Option<Vec<u64>> {
 }
 
 // Функция добавляет пользователя в базу данных, в случае ошибки - возвращает Err()
-pub fn try_add_user(user: User, con: &Connection) -> Result<(), Box<dyn Error>> {
+pub fn try_add_user(user: UserDbEntry, con: &Connection) -> Result<(), Box<dyn Error>> {
     let query = "INSERT INTO Users (ID, attempts, is_won, questions_quantity) VALUES (?, ?, ?, ?)";
 
     // Выполняем запрос с помощью метода execute, передавая параметры
