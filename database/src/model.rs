@@ -1,5 +1,5 @@
 #[derive(Debug)]
-pub struct User {
+pub struct UserDbEntry {
     // Соответствует айди пользователя в телеграме
     pub id: u64,
     // Количество попыток
