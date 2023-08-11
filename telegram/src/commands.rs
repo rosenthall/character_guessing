@@ -28,6 +28,7 @@ pub enum Command {
     Info
 }
 
+//noinspection ALL
 pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseResult<()> {
     info!("Got new command in group : {}", msg.chat.clone().id.0);
 
@@ -43,7 +44,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
     let is_chat_in_whitelist = allowed_groups.contains(&msg.chat.clone().id.0);
     info!("Group {} is in whitelist : {}", msg.chat.clone().id.0, is_chat_in_whitelist.clone());
     //Создаем инстанс подключения к базе данных
-    let con = database::control::DATABASE_HANDLER.lock().await;
+    let con = control::DATABASE_HANDLER.lock().await;
     //Проверяем есть ли этот пользователь в базе данных
     let author = msg.from().unwrap();
     let user = check_user(author.id.0, &con);
@@ -117,6 +118,17 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         Command::Question(cmd) => {
             info!("New question : {cmd}");
 
+            // Минимальная длинна вопроса. Если вопрос короче 5 символов, то и отвечать смысла нет.
+            if cmd.len() <= 5 {
+                bot.send_message(
+                    msg.chat.id,
+                    "После команды \"/question\" должен следовать вопрос. \n Подробнее - /info",
+                ).reply_to_message_id(msg.id)
+                    .await
+                    .unwrap();
+                return Ok(());
+            }
+
             //Если человек уже задал больше трех вопросов - отказываем.
             if user.questions_quantity >= 3 {
                 bot.send_message(
@@ -154,7 +166,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
             let mut message: String = String::from("Вот люди которые справились с угадыванием сегодняшнего персонажа : \n ");
             let winners_list = {
                 let mut users = vec!();
-                let requests = database::get_winning_user_ids(&con).unwrap()
+                let requests = get_winning_user_ids(&con).unwrap()
                     .iter()
                     .map(|i| UserId(*i))
                     .map(|i| bot.get_chat_member(msg.chat.id, i))
