@@ -22,6 +22,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
             .send_message(ctx.msg.chat.id, "Ты уже победил сегодня!")
             .reply_to_message_id(ctx.msg.id)
             .await;
+        return Ok(());
     }
 
     //Если человек попытался угадать больше 5 раз - отказываем.
