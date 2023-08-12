@@ -53,7 +53,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
 
         let res: u8 = normalized_damerau_levenshtein(&ctx.command_content, &name.to_lowercase())
             .mul(100.0) as u8;
-        match res {
+        return match res {
             // От 60 до 100 схожести означает победу.
             60..=100 => {
                 dbg!(res.clone());
@@ -73,7 +73,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
 
                 update_is_won(&ctx.con, ctx.db_entry_user.id, true).unwrap();
 
-                return Ok(());
+                Ok(())
             }
             _ => {
                 let _ = ctx
@@ -88,7 +88,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                         ),
                     )
                     .await;
-                return Ok(());
+                Ok(())
             }
         }
     }
