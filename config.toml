@@ -16,8 +16,7 @@ helper_prompt_template = "You're in a chat room. You are trying to be as helpful
 # Содержит хешкарту с ключем в виде даты и персонажем ввиде строки.
 [calendar]
 plan = [
-    { date = "23-08-10", character = ["Клеопатра", "Cleopatra"] },
-    { date = "23-08-11", character = ["Леонардо да Винчи", "Leonardo da Vinci", "Леонардо Да Винчи", "Леонардо Давинчи"] },
-    { date = "23-08-12", character = ["Мария Кюри", "Marie Curie", "мария кюри", "Мария Кьюри"] },
-    { date = "23-08-13", character = ["Альберт Эйнштейн", "Albert Einstein", "Эйнштейн"] },
+
+    { date = "23-08-12", character = ["Мария Кюри", "Marie Curie"]},
+    { date = "23-08-13", character = ["Альберт Эйнштейн", "Albert Einstein"]},
 ]

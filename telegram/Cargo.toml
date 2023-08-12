@@ -14,3 +14,4 @@ config = {path = "../config"}
 openai = {path = "../openai"}
 database = {path = "../database"}
 rusqlite = "0.29.0"
+strsim = "0.10.0"
