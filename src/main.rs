@@ -26,7 +26,6 @@ async fn main() {
         update_db_each_day_service().await;
     });
 
-
     //handle для запуска телеграм бота.
     let telegram_handle = tokio::spawn(async move {
         telegram::start_bot(&CONFIG.telegram).await;

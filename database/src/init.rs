@@ -3,9 +3,9 @@ use rusqlite::{params, Connection};
 use std::result::Result;
 use std::time::Duration;
 
-use log::*;
 use crate::control;
-use crate::control::{update_db_connection};
+use crate::control::update_db_connection;
+use log::*;
 
 // Функция для создания новой базы данных и таблицы
 pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
@@ -38,23 +38,21 @@ pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
     Ok(conn)
 }
 
-
 pub async fn update_db_each_day_service() {
     info!("DB updating Service started!");
 
     loop {
-
-        tokio::spawn( async {
+        tokio::spawn(async {
             //Ожидаем 24 часа перед исполнением кода
 
-            let _ = tokio::time::sleep(Duration::from_secs(24*60*60)).await;
+            let _ = tokio::time::sleep(Duration::from_secs(24 * 60 * 60)).await;
             let formatted_date = control::get_current_formatted_date();
 
             // Инициализируем новую базу данных
             let new_db = create_database_and_table(&formatted_date).unwrap();
             update_db_connection(new_db).await;
-
-
-        }).await.unwrap();
+        })
+        .await
+        .unwrap();
     }
 }

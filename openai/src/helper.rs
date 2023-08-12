@@ -36,21 +36,23 @@ pub async fn helper_question(question: String) -> String {
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::System)
                 .content("You're a helpful bot in our chat room called E7")
-                .build().unwrap(),
-
+                .build()
+                .unwrap(),
             // Сообщение с ролью "ChatGPT" и содержанием промпта для ChatGPT
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::Assistant) // Здесь ассистент играет роль ChatGPT
                 .content(chatgpt_prompt)
-                .build().unwrap(),
-
+                .build()
+                .unwrap(),
             // Сообщение с ролью "User" и содержанием вопроса пользователя
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::User)
                 .content(&user_prompt)
-                .build().unwrap(),
+                .build()
+                .unwrap(),
         ])
-        .build().unwrap();
+        .build()
+        .unwrap();
 
     let response = client.chat().create(request).await.unwrap();
     info!("Ответ от openai api : {:#?}", response);

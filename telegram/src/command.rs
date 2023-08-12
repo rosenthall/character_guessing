@@ -1,26 +1,21 @@
-use tokio::sync::MutexGuard;
 use config::CONFIG;
 use database::*;
-use log::{info};
+use log::info;
 use teloxide::prelude::*;
-use teloxide::{Bot};
+use teloxide::Bot;
+use tokio::sync::MutexGuard;
 
 use teloxide_macros::BotCommands;
 
-use database::model::{UserDbEntry};
+use database::model::UserDbEntry;
 use teloxide::types::User as TelergamUser;
 
 use rusqlite::Connection;
 
-
-
-
-
-
 #[derive(BotCommands, Clone, Debug)]
 #[command(
-rename_rule = "lowercase",
-description = "These commands are supported:"
+    rename_rule = "lowercase",
+    description = "These commands are supported:"
 )]
 pub enum Command {
     #[command(description = "Assume today's character.")]
@@ -33,21 +28,21 @@ pub enum Command {
     Winners,
 
     #[command(description = "Just information about the game")]
-    Info
+    Info,
 }
 
 pub struct CommandContext<'a> {
-    pub db_entry_user : &'a UserDbEntry,
-    pub telegram_user : TelergamUser,
+    pub db_entry_user: &'a UserDbEntry,
+    pub telegram_user: TelergamUser,
     pub msg: Message,
-    pub command_content : String,
-    pub bot : &'a Bot,
-    pub con : MutexGuard<'a, Connection>,
+    pub command_content: String,
+    pub bot: &'a Bot,
+    pub con: MutexGuard<'a, Connection>,
 }
 
 //noinspection ALL
 // Функция проверяет условия комманды и передает выполнение в чат
-pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseResult<()> {
+pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
     info!("Got new command in group : {}", msg.chat.clone().id.0);
 
     // Проверяем есть ли эта группа в вайтлисте
@@ -59,33 +54,28 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         .map(|i| i.parse::<i64>().unwrap())
         .collect::<Vec<i64>>();
 
-
     let is_chat_in_whitelist = allowed_groups.contains(&msg.chat.clone().id.0);
-    info!("Group {} is in whitelist : {}", msg.chat.clone().id.0, is_chat_in_whitelist.clone());
-
+    info!(
+        "Group {} is in whitelist : {}",
+        msg.chat.clone().id.0,
+        is_chat_in_whitelist.clone()
+    );
 
     // Если чат не в вайтлисте - комманду не обрабатываем.
     if !is_chat_in_whitelist {
         return Ok(());
     }
 
-
-
     //Создаем инстанс подключения к базе данных
     let con = control::DATABASE_HANDLER.lock().await;
-
-
 
     //Проверяем есть ли этот пользователь в базе данных
     let author = msg.clone();
     let author = author.from().unwrap();
     let user = check_user(author.id.0, &con);
 
-
-
     let is_user_exists_in_db = user.is_some();
     dbg!(is_user_exists_in_db);
-
 
     // Добавляем пользователя в дб, если его там нет
     if !is_user_exists_in_db {
@@ -97,11 +87,11 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
                 questions_quantity: 0,
             },
             &con,
-        ).unwrap()
+        )
+        .unwrap()
     }
 
-
-    let context = CommandContext{
+    let context = CommandContext {
         db_entry_user: &check_user(author.id.0, &con).unwrap(),
         telegram_user: author.clone(),
         msg: msg.clone(),
@@ -110,16 +100,11 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         con,
     };
 
-
-
-
-
-
     match cmd.clone() {
         Command::Answer(cmd) => {
             // Обновляем контекст комманды, изменяя лишь cmd
             let context = CommandContext {
-                command_content : cmd,
+                command_content: cmd,
 
                 ..context
             };
@@ -130,31 +115,27 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command,) -> ResponseRe
         }
 
         Command::Question(cmd) => {
-
             let context = CommandContext {
-                command_content : cmd,
+                command_content: cmd,
 
                 ..context
             };
-
 
             crate::commands::question::execute(context).await.unwrap();
 
             Ok(())
         }
 
-
         Command::Winners => {
             crate::commands::winners::execute(context).await.unwrap();
 
             Ok(())
-        },
-
+        }
 
         Command::Info => {
             crate::commands::info::execute(context).await.unwrap();
 
             Ok(())
-        },
+        }
     }
 }

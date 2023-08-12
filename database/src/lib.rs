@@ -40,9 +40,12 @@ pub fn check_user(id: u64, con: &Connection) -> Option<model::UserDbEntry> {
 }
 
 pub fn get_winning_user_ids(conn: &Connection) -> Option<Vec<u64>> {
-    let mut query = conn.prepare("SELECT ID FROM Users WHERE is_won = 1").unwrap();
+    let mut query = conn
+        .prepare("SELECT ID FROM Users WHERE is_won = 1")
+        .unwrap();
     let user_ids = query
-        .query_map([], |row| row.get(0)).unwrap()
+        .query_map([], |row| row.get(0))
+        .unwrap()
         .filter_map(Result::ok)
         .collect();
 

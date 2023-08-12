@@ -1,11 +1,11 @@
 use crate::init::create_database_and_table;
-use chrono::prelude::*;
-use rusqlite::Connection;
-use std::sync::{Arc};
-use tokio::sync::{Mutex, MutexGuard};
 use async_trait::async_trait;
+use chrono::prelude::*;
 use log::info;
 use once_cell::sync::Lazy;
+use rusqlite::Connection;
+use std::sync::Arc;
+use tokio::sync::{Mutex, MutexGuard};
 
 pub(crate) fn get_current_formatted_date() -> String {
     let formatted_date = {
@@ -18,12 +18,10 @@ pub(crate) fn get_current_formatted_date() -> String {
     formatted_date
 }
 
-
-
 #[async_trait]
 trait ControlDatabase {
     //Просто конструктор
-    fn from(c : Arc<Mutex<Connection>>) -> Self;
+    fn from(c: Arc<Mutex<Connection>>) -> Self;
 
     //Функция для самой первой инициализации базы.
     fn new_() -> Self;
@@ -37,7 +35,6 @@ trait ControlDatabase {
 
 pub type DatabaseHandler = Arc<Mutex<Connection>>;
 
-
 #[async_trait]
 impl ControlDatabase for DatabaseHandler {
     fn from(c: Arc<Mutex<Connection>>) -> Self {
@@ -50,7 +47,6 @@ impl ControlDatabase for DatabaseHandler {
         let con = create_database_and_table(&formatted_date).unwrap();
 
         Arc::new(Mutex::new(con))
-
     }
 
     async fn get_connection(&self) -> MutexGuard<Connection> {
@@ -64,19 +60,16 @@ impl ControlDatabase for DatabaseHandler {
 
         let con = create_database_and_table(&formatted_date).unwrap();
         self = &mut ControlDatabase::from(Arc::new(Mutex::new(con)));
-
     }
 }
 
-pub static DATABASE_HANDLER: Lazy<DatabaseHandler> = Lazy::new(||{
+pub static DATABASE_HANDLER: Lazy<DatabaseHandler> = Lazy::new(|| {
     let handle = DatabaseHandler::new_();
-
 
     handle
 });
 
-
-pub(crate) async fn update_db_connection(con : Connection) {
+pub(crate) async fn update_db_connection(con: Connection) {
     *DATABASE_HANDLER.lock().await = con;
     info!("Updated db connection!");
 }
