@@ -1,9 +1,12 @@
 use crate::command::CommandContext;
 use log::{info, trace};
-use teloxide::payloads::SendMessageSetters;
+use teloxide::payloads::{SendMessageSetters};
 use teloxide::requests::Requester;
+use config::CONFIG;
 
 use database::update_questions_quantity;
+
+//noinspection ALL
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     info!("New question : {}", ctx.command_content);
@@ -35,8 +38,18 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         return Ok(());
     }
 
-    let ai_answer = openai::character_question(ctx.command_content).await;
+    let mut ai_answer = openai::character_question(ctx.command_content).await;
     info!("AI ANSWER : {}", ai_answer.clone());
+
+
+    // Проверяем сообщение на наличие одного из сегодняшних имен. Если оно есть - цензурим.
+    let names = CONFIG.calendar.try_get_daily_character_names().unwrap();
+    if names.iter().any(|name| ai_answer.to_lowercase().contains(&name.to_lowercase())) {
+        for name in &names {
+            ai_answer = ai_answer.replace(name, "[ИМЯ ПЕРСОНАЖА]");
+        }
+    }
+
 
     let _ = ctx
         .bot
