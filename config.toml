@@ -1,6 +1,6 @@
 [telegram]
 # Токен телеграм-бота (строка).
-telegram_token = "6431499382:AAHLkiuhOh0gwQpwLcMtBw0kwW-isqrBOFg"
+telegram_token = "6403116353:AAF2bkZEtpJNf3XsxNroX0PxzLb6UTSPj2Y"
 # Айди групп в которой он будет работать, белый список (массив из строк).
 telegram_allowed_groups = ["-1001383474381", "-1001816712387"]
 # Айди администраторов бота, белый список (массив из строк).
@@ -16,7 +16,9 @@ helper_prompt_template = "You're in a chat room. You are trying to be as helpful
 # Содержит хешкарту с ключем в виде даты и персонажем ввиде строки.
 [calendar]
 plan = [
-
-    { date = "23-08-12", character = ["Мария Кюри", "Marie Curie"]},
-    { date = "23-08-13", character = ["Альберт Эйнштейн", "Albert Einstein"]},
+	{ date = "23-08-14", character = ["Аристотель", "Aristotle"]},
+	{ date = "23-08-15", character = ["Чарлз Дарвин", "Charles Darwin"]},
+	{ date = "23-08-16", character = ["Николай Коперник", "Nicolaus Copernicus"]},
+	{ date = "23-08-17", character = ["Платон", "Platon"]},
+	{ date = "23-08-18", character = ["Чарлз Бэббидж", "Charles Babbage"]},
 ]
