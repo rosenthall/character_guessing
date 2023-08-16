@@ -21,6 +21,9 @@ pub enum Command {
     #[command(description = "Assume today's character.")]
     Answer(String),
 
+    #[command(description = "Make request to gpt4")]
+    Gpt(String),
+
     #[command(description = "Ask a question of today's character.")]
     Question(String),
 
@@ -38,6 +41,7 @@ pub struct CommandContext<'a> {
     pub command_content: String,
     pub bot: &'a Bot,
     pub con: MutexGuard<'a, Connection>,
+    pub winnersdb_con : MutexGuard<'a, Connection>
 }
 
 //noinspection ALL
@@ -66,8 +70,9 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
         return Ok(());
     }
 
-    //Создаем инстанс подключения к базе данных
+    //Создаем инстансы подключения к базам данных
     let con = control::DATABASE_HANDLER.lock().await;
+    let winners_con = database::winners::WINNERS_DB.lock().await;
 
     //Проверяем есть ли этот пользователь в базе данных
     let author = msg.clone();
@@ -97,7 +102,8 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
         msg: msg.clone(),
         command_content: "".to_string(),
         bot: &bot,
-        con,
+        con : con,
+        winnersdb_con : winners_con
     };
 
     match cmd.clone() {
@@ -112,7 +118,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             crate::commands::answer::execute(context).await.unwrap();
 
             Ok(())
-        }
+        },
 
         Command::Question(cmd) => {
             let context = CommandContext {
@@ -124,13 +130,26 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             crate::commands::question::execute(context).await.unwrap();
 
             Ok(())
-        }
+        },
+
+        Command::Gpt(cmd) => {
+            let context = CommandContext {
+                command_content: cmd,
+
+                ..context
+            };
+
+            crate::commands::gpt::execute(context).await.unwrap();
+
+            Ok(())
+        },
+
 
         Command::Winners => {
             crate::commands::winners::execute(context).await.unwrap();
 
             Ok(())
-        }
+        },
 
         Command::Info => {
             crate::commands::info::execute(context).await.unwrap();
