@@ -4,9 +4,9 @@
 
 
 use std::error::Error;
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, named_params, params};
 use std::sync::{Arc};
-use tokio::sync::{MutexGuard,Mutex};
+use tokio::sync::{Mutex};
 use log::{error, trace};
 use once_cell::sync::Lazy;
 use crate::model::WinnerEntry;
@@ -86,11 +86,13 @@ pub fn update_winners_requests(
         attempts.clone()
     );
 
+
     connection
         .execute(
-            "UPDATE Winners SET requests = ?1 WHERE id = ?2",
-            [attempts as u16, user_id.try_into().unwrap()],
+            "UPDATE Winners SET requests = :attempts WHERE id = :user_id",
+            named_params! {":attempts": attempts, ":user_id": user_id},
         )
         .unwrap();
+
     Ok(())
 }
