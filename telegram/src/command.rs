@@ -24,6 +24,9 @@ pub enum Command {
     #[command(description = "Make request to gpt4")]
     Gpt(String),
 
+    #[command(description = "View your remaining requests")]
+    Requests,
+
     #[command(description = "Ask a question of today's character.")]
     Question(String),
 
@@ -143,6 +146,12 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
 
             Ok(())
         },
+
+        Command::Requests => {
+            crate::commands::requests::execute(context).await.unwrap();
+
+            Ok(())
+        }
 
 
         Command::Winners => {
