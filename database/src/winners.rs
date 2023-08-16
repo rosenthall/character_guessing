@@ -5,8 +5,9 @@
 
 use std::error::Error;
 use rusqlite::{Connection, params};
-use std::sync::{Arc, Mutex};
-use log::error;
+use std::sync::{Arc};
+use tokio::sync::{MutexGuard,Mutex};
+use log::{error, trace};
 use once_cell::sync::Lazy;
 use crate::model::WinnerEntry;
 
@@ -71,4 +72,25 @@ pub fn try_get_winner(id : u64, con: &Connection) -> Option<WinnerEntry> {
             None
         }
     }
+}
+
+
+pub fn update_winners_requests(
+    connection: &Connection,
+    user_id: u64,
+    attempts: u16,
+) -> Result<(), &'static dyn Error> {
+    trace!(
+        "Изменяю количество запросов для пользователя : {}, новое значение : {}",
+        user_id.clone(),
+        attempts.clone()
+    );
+
+    connection
+        .execute(
+            "UPDATE Winners SET requests = ?1 WHERE id = ?2",
+            [attempts as u16, user_id.try_into().unwrap()],
+        )
+        .unwrap();
+    Ok(())
 }
