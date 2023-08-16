@@ -29,6 +29,9 @@ pub enum Command {
 
     #[command(description = "Just information about the game")]
     Info,
+
+    #[command(description = "Make a request to gpt4")]
+    Gpt(String)
 }
 
 pub struct CommandContext<'a> {
@@ -125,6 +128,19 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
 
             Ok(())
         }
+
+        Command::Gpt(cmd) => {
+            let context = CommandContext {
+                command_content: cmd,
+
+                ..context
+            };
+
+            crate::commands::gpt::execute(context).await.unwrap();
+
+            Ok(())
+        }
+
 
         Command::Winners => {
             crate::commands::winners::execute(context).await.unwrap();
