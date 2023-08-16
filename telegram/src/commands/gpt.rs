@@ -1,12 +1,9 @@
 use crate::command::CommandContext;
-use log::{info, trace};
+use log::{info};
 use teloxide::payloads::{SendMessageSetters};
 use teloxide::requests::Requester;
 use database::model::WinnerEntry;
 use database::winners::*;
-
-use database::{try_add_user, update_questions_quantity};
-
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     info!("New gpt question : {}", ctx.command_content);
@@ -24,7 +21,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     }).unwrap();
 
     // Если у пользователя есть запросы - сообственно делаем запрос к openai.
-    if winner_entry.id <= 0 {
+    if winner_entry.requests != 0 {
 
         let ai_respone = openai::helper_question(ctx.command_content).await;
 
@@ -41,7 +38,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
 
     //В случае если оставшихся запросов нет - отправляем сообщение об этом.
     let _ = ctx.bot
-        .send_message(ctx.msg.chat.id, "Извините, у вас нет запросов к gpt4. \n Команда /info для подробной информации.")
+        .send_message(ctx.msg.chat.id, "Извините, у вас нет запросов к gpt4.\n Команда /info для подробной информации.")
         .reply_to_message_id(ctx.msg.id)
         .await;
 
