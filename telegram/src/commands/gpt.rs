@@ -11,17 +11,6 @@ use database::{try_add_user, update_questions_quantity};
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     info!("New gpt question : {}", ctx.command_content);
 
-
-    let _ = ctx
-        .bot
-        .send_message(
-            ctx.msg.chat.id,
-            "Вот ссылка на мануал : https://telegra.ph/Kak-polzovatsya-botom-08-09",
-        )
-        .reply_to_message_id(ctx.msg.id)
-        .await;
-
-
     // получаем доступ к записи о пользователе который вызвал комманду. Если записи нет - добавляем его туда.
     let winner_entry  = try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).or_else(|| {
 
@@ -34,8 +23,19 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         Some(try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).unwrap())
     }).unwrap();
 
-    // Если у пользователя есть запросы
+    // Если у пользователя есть запросы - сообственно делаем запрос к openai.
     if winner_entry.id <= 0 {
+
+        let ai_respone = openai::helper_question(ctx.command_content).await;
+
+        let _ = ctx.bot
+            .send_message(ctx.msg.chat.id, ai_respone)
+            .reply_to_message_id(ctx.msg.id)
+            .await;
+
+        //Отнимаем у этого пользователя 1 запрос.
+        update_winners_requests(&ctx.winnersdb_con, winner_entry.id,winner_entry.requests-1).unwrap();
+
         return Ok(())
     }
 
