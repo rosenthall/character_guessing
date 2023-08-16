@@ -8,7 +8,7 @@ use async_openai::types::{
 use async_openai::{config::OpenAIConfig, Client};
 
 pub async fn character_question(question: String) -> String {
-    let config = OpenAIConfig::new().with_api_key(CONFIG.clone().openai.openai_api_token_gpt3);
+    let config = OpenAIConfig::new().with_api_key(CONFIG.clone().openai.openai_api_token);
 
     // Получаем промпт для роли "ChatGPT" из конфигурации
 

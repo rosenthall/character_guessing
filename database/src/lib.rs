@@ -40,8 +40,9 @@ pub fn check_user(id: u64, con: &Connection) -> Option<model::UserDbEntry> {
     }
 }
 
-pub fn get_winning_user_ids(conn: &Connection) -> Option<Vec<u64>> {
-    let mut query = conn
+// Функция получает список всех победивших сегодня людей
+pub fn get_winning_user_ids(con: &Connection) -> Option<Vec<u64>> {
+    let mut query = con
         .prepare("SELECT ID FROM Users WHERE is_won = 1")
         .unwrap();
     let user_ids = query
