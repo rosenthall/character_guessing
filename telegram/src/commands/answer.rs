@@ -1,12 +1,14 @@
 use crate::CommandContext;
 use config::CONFIG;
-use database::{check_user, update_is_won};
+use database::{check_user};
 use std::ops::Mul;
 use std::result::Result;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::Requester;
 
 use strsim::normalized_damerau_levenshtein;
+use database::model::WinnerEntry;
+use database::winners::{try_add_winner, try_get_winner, update_winners_requests};
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     let user = check_user(ctx.telegram_user.id.0, &ctx.con).unwrap();
@@ -71,7 +73,22 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                     )
                     .await;
 
-                update_is_won(&ctx.con, ctx.db_entry_user.id, true).unwrap();
+                // Ищем пользователя в базе данных. Если его там нет - добавляем.
+                let winner_entry  = try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).or_else(|| {
+
+                    // Добавляем если такого поля нет.
+                    try_add_winner(WinnerEntry {
+                        id: ctx.telegram_user.id.0,
+                        requests: 0
+                    }, &ctx.winnersdb_con).unwrap();
+
+                    Some(try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).unwrap())
+                }).unwrap();
+
+
+                // Добавляем ему +3 запроса (сообственно награда)
+                let _ = update_winners_requests(&ctx.winnersdb_con, ctx.telegram_user.id.0, winner_entry.requests+3);
+
 
                 Ok(())
             }
