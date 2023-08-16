@@ -1,35 +1,48 @@
 use crate::command::CommandContext;
-use log::{info, trace};
+use log::{info};
 use teloxide::payloads::{SendMessageSetters};
 use teloxide::requests::Requester;
-use config::CONFIG;
+use database::model::WinnerEntry;
 use database::winners::*;
 
-use database::update_questions_quantity;
-
-//noinspection ALL
-
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
-    info!("New gpt_question : {}", ctx.command_content);
+    info!("New gpt question : {}", ctx.command_content);
 
-    // Создаем отдельное подключение к WINNERS_DB, так как ctx.con ведёт к сегодняшней дб, а не к постоянной.
-    let con = WINNERS_DB.lock().unwrap();
+    // получаем доступ к записи о пользователе который вызвал комманду. Если записи нет - добавляем его туда.
+    let winner_entry  = try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).or_else(|| {
 
+        // Добавляем если такого поля нет.
+        try_add_winner(WinnerEntry {
+            id: ctx.telegram_user.id.0,
+            requests: 0
+        }, &ctx.winnersdb_con).unwrap();
 
-    let ai_answer = openai::helper_question(ctx.command_content).await;
-    info!("AI ANSWER : {}", ai_answer.clone());
+        Some(try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).unwrap())
+    }).unwrap();
 
-    let _ = ctx
-        .bot
-        .send_message(ctx.msg.chat.id, ai_answer)
+    // Если у пользователя есть запросы - сообственно делаем запрос к openai.
+    if winner_entry.requests != 0 {
+
+        let ai_respone = openai::helper_question(ctx.command_content).await;
+
+        let _ = ctx.bot
+            .send_message(ctx.msg.chat.id, ai_respone)
+            .reply_to_message_id(ctx.msg.id)
+            .await;
+
+        //Отнимаем у этого пользователя 1 запрос.
+        update_winners_requests(&ctx.winnersdb_con, winner_entry.id,winner_entry.requests-1).unwrap();
+
+        return Ok(())
+    }
+
+    //В случае если оставшихся запросов нет - отправляем сообщение об этом.
+    let _ = ctx.bot
+        .send_message(ctx.msg.chat.id, "Извините, у вас нет запросов к gpt4.\n Команда /info для подробной информации.")
         .reply_to_message_id(ctx.msg.id)
         .await;
 
-    update_questions_quantity(
-        &ctx.con,
-        ctx.db_entry_user.id,
-        ctx.db_entry_user.questions_quantity + 1,
-    )
-        .unwrap();
+
     Ok(())
 }
+

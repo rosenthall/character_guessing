@@ -1,6 +1,6 @@
 [telegram]
 # Токен телеграм-бота (строка).
-telegram_token = "6431499382:AAHLkiuhOh0gwQpwLcMtBw0kwW-isqrBOFg"
+telegram_token = "6403116353:AAF2bkZEtpJNf3XsxNroX0PxzLb6UTSPj2Y"
 # Айди групп в которой он будет работать, белый список (массив из строк).
 telegram_allowed_groups = ["-1001383474381", "-1001816712387"]
 # Айди администраторов бота, белый список (массив из строк).

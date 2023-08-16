@@ -3,3 +3,4 @@ pub mod info;
 pub mod question;
 pub mod winners;
 pub mod gpt;
+pub mod requests;
