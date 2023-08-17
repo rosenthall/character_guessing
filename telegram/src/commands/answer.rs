@@ -1,6 +1,5 @@
 use crate::CommandContext;
 use config::CONFIG;
-use database::{check_user};
 use std::ops::Mul;
 use std::result::Result;
 use teloxide::payloads::SendMessageSetters;
@@ -11,25 +10,23 @@ use database::model::WinnerEntry;
 use database::winners::{try_add_winner, try_get_winner, update_winners_requests};
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
-    let user = check_user(ctx.telegram_user.id.0, &ctx.con).unwrap();
 
     ctx.bot
         .delete_message(ctx.msg.chat.id, ctx.msg.id)
         .await
         .unwrap();
 
-    if user.is_won {
+    if ctx.db_entry_user.is_won {
         let _ = ctx
             .bot
-            .send_message(ctx.msg.chat.id, "Ты уже победил сегодня!")
-            .reply_to_message_id(ctx.msg.id)
+            .send_message(ctx.msg.chat.id, &format!("{}, ты уже победил сегодня!", ctx.telegram_user.mention().unwrap_or(ctx.telegram_user.first_name)))
             .await;
         return Ok(());
     }
 
     //Если человек попытался угадать больше 5 раз - отказываем.
-    if user.attempts >= 5 {
-        ctx.bot
+    if ctx.db_entry_user.attempts >= 5 {
+        let _ = ctx.bot
             .send_message(
                 ctx.msg.chat.id,
                 "Извини, но ты уже сделал 5 попыток отгадать персонажа сегодня!\
@@ -72,8 +69,12 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                         ),
                     )
                     .await;
+                // Обновляем показания в сегодняшней тоже.
+                let _ = database::update_is_won(&ctx.con, ctx.telegram_user.id.0, true);
 
-                // Ищем пользователя в базе данных. Если его там нет - добавляем.
+
+
+                // Ищем пользователя в постоянной базе данных. Если его там нет - добавляем.
                 let winner_entry  = try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).or_else(|| {
 
                     // Добавляем если такого поля нет.
