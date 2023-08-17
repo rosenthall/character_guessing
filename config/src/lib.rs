@@ -18,7 +18,8 @@ pub struct TelegramConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OpenAIConfig {
     pub openai_api_token: String,
-    pub tokens_per_request_limit: u32,
+    pub character_tokens_per_request_limit: u32,
+    pub gpt_tokens_per_request_limit : u32,
     pub default_prompt_template: String,
     pub helper_prompt_template: String,
 }

@@ -20,7 +20,7 @@ pub async fn character_question(question: String) -> String {
     );
     dbg!(chatgpt_prompt.clone());
     // Получаем максимальное количество токенов на один запрос к openai
-    let token_limit = CONFIG.openai.clone().tokens_per_request_limit;
+    let token_limit = CONFIG.openai.clone().character_tokens_per_request_limit;
 
     // Получаем промпт для вопроса от пользователя (аргумент функции)
     let user_prompt = question;
