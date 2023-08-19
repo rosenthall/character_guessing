@@ -16,9 +16,17 @@ helper_prompt_template = "You're in a chat room. You are trying to be as helpful
 # Содержит хешкарту с ключем в виде даты и персонажем ввиде строки.
 [calendar]
 plan = [
-	{ date = "23-08-14", character = ["Аристотель", "Aristotle"]},
-	{ date = "23-08-15", character = ["Чарлз Дарвин", "Charles Darwin"]},
-	{ date = "23-08-16", character = ["Николай Коперник", "Nicolaus Copernicus"]},
-	{ date = "23-08-17", character = ["Платон", "Platon"]},
-	{ date = "23-08-18", character = ["Чарлз Бэббидж", "Charles Babbage"]},
+	{ date = "23-08-19", character = ["Винсент ван Гог", "Vincent van Gogh"]},
+	{ date = "23-08-20", character = ["Фрида Кало", "Frida Kahlo"]},
+	{ date = "23-08-21", character = ["Уильям Шекспир", "William Shakespeare"]},
+	{ date = "23-08-22", character = ["Джейн Остин", "Jane Austen"]},
+	{ date = "23-08-23", character = ["Наполеон Бонапарт", "Napoleon Bonaparte"]},
+	{ date = "23-08-24", character = ["Григорий Распутин", "Grigori Rasputin"]},
+	{ date = "23-08-25", character = ["Пабло Пикассо", "Pablo Picasso"]},
+	{ date = "23-08-26", character = ["Маргарет Тэтчер", "Margaret Thatcher"]},
+	{ date = "23-08-27", character = ["Дали Лама", "Dalai Lama"]},
+	{ date = "23-08-28", character = ["Оскар Уайльд", "Oscar Wilde"]},
+	{ date = "23-08-29", character = ["Адольф Гитлер", "Adolf Hitler"]},
+	{ date = "23-08-30", character = ["Гераклит", "Heraclitus"]},
+
 ]
