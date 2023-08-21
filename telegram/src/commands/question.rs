@@ -38,6 +38,23 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         return Ok(());
     }
 
+    // Если в вопросе есть запрещенные слова - отказываем.
+    if CONFIG.openai.prompt_blacklist_words.iter().any(|f| ctx.command_content.clone().to_lowercase().contains(f)) {
+
+        ctx.bot
+            .send_message(
+                ctx.msg.chat.id,
+                "Извини, в твоём сообщении есть запрещенные слова!\nПопробуй перефразировать или не задавать прямых вопросов касающихся имени персонажа!",
+            )
+            .reply_to_message_id(ctx.msg.id)
+            .await
+            .unwrap();
+
+
+        return Ok(())
+    }
+
+
     let mut ai_answer = openai::character_question(ctx.command_content).await;
     info!("AI ANSWER : {}", ai_answer.clone());
 

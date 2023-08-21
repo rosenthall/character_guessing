@@ -22,6 +22,7 @@ pub struct OpenAIConfig {
     pub gpt_tokens_per_request_limit : u32,
     pub default_prompt_template: String,
     pub helper_prompt_template: String,
+    pub prompt_blacklist_words : Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
