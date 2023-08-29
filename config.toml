@@ -9,7 +9,7 @@ telegram_admin_ids = ["6261989159", "667588148"]
 [openai]
 openai_api_token = "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"
 character_tokens_per_request_limit = 412
-gpt_tokens_per_request_limit = 800
+gpt_tokens_per_request_limit = 1600
 default_prompt_template = "Become a historical character (name given at the end). NEVER give direct information about yourself (name, parents, place and date of birth, etc.), only short answers that do not immediately reveal your identity are allowed. Answer only in that language you have been asked. Be concise, be direct. Do not mention the name of the company/organization or political party you belong to. Do not answer questions that you have not been asked. You should answer ONLY those questions that you are explicitly asked. Your job is to give an accurate and true representation of the character's thoughts, opinions, and experiences without directly revealing their identity. Use quotes and anecdotes from their life to substantiate your answers. Character : "
 helper_prompt_template = "You're in a chat room. You are trying to be as helpful as possible to the other chat participants. Respond in the language in which you are addressed."
 prompt_blacklist_words = ["имя", "name", "фамилия", "surname", "фамилию"]
@@ -18,17 +18,6 @@ prompt_blacklist_words = ["имя", "name", "фамилия", "surname", "фам
 # Содержит хешкарту с ключем в виде даты и персонажем ввиде строки.
 [calendar]
 plan = [
-	{ date = "23-08-19", character = ["Винсент ван Гог", "Vincent van Gogh"]},
-	{ date = "23-08-20", character = ["Фрида Кало", "Frida Kahlo"]},
-	{ date = "23-08-21", character = ["Уильям Шекспир", "William Shakespeare"]},
-	{ date = "23-08-22", character = ["Джейн Остин", "Jane Austen"]},
-	{ date = "23-08-23", character = ["Наполеон Бонапарт", "Napoleon Bonaparte"]},
-	{ date = "23-08-24", character = ["Григорий Распутин", "Grigori Rasputin"]},
-	{ date = "23-08-25", character = ["Пабло Пикассо", "Pablo Picasso"]},
-	{ date = "23-08-26", character = ["Маргарет Тэтчер", "Margaret Thatcher"]},
-	{ date = "23-08-27", character = ["Дали Лама", "Dalai Lama"]},
-	{ date = "23-08-28", character = ["Оскар Уайльд", "Oscar Wilde"]},
-	{ date = "23-08-29", character = ["Адольф Гитлер", "Adolf Hitler"]},
 	{ date = "23-08-30", character = ["Гераклит", "Heraclitus"]},
-
+ 	{ date = "23-08-31", character = ["Александр Великий", "Alexander the Great"]},
 ]
