@@ -35,7 +35,7 @@ pub async fn character_question(question: String) -> String {
     // Формируем запрос на создание чат-подобной модели с указанными ролями и сообщениями
     let request = CreateChatCompletionRequestArgs::default()
         .max_tokens(token_limit as u16)
-        .model("gpt-3.5-turbo")
+        .model("gpt-4")
         .messages([
             // Сообщение с ролью "System" для установки контекста ассистента
             ChatCompletionRequestMessageArgs::default()
