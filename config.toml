@@ -1,6 +1,6 @@
 [telegram]
 # Токен телеграм-бота (строка).
-telegram_token = "6431499382:AAHLkiuhOh0gwQpwLcMtBw0kwW-isqrBOFg"
+telegram_token = "6403116353:AAF2bkZEtpJNf3XsxNroX0PxzLb6UTSPj2Y"
 # Айди групп в которой он будет работать, белый список (массив из строк).
 telegram_allowed_groups = ["-1001383474381", "-1001816712387"]
 # Айди администраторов бота, белый список (массив из строк).
@@ -18,18 +18,20 @@ prompt_blacklist_words = ["имя", "name", "фамилия", "surname", "фам
 # Содержит хешкарту с ключем в виде даты и персонажем ввиде строки.
 [calendar]
 plan = [
-	{ date = "23-09-16", character = ["Пётр I", "Peter the Great"] },
-	{ date = "23-09-17", character = ["Джордж Вашингтон", "George Washington"] },
-	{ date = "23-09-18", character = ["Иван Грозный", "Ivan the Terrible"] },
-	{ date = "23-09-19", character = ["Клеопатра", "Cleopatra"] },
-	{ date = "23-09-20", character = ["Франсиско Франко", "Francisco Franco Bahamonde"] },
-	{ date = "23-09-21", character = ["Леонардо да Винчи", "Leonardo da Vinci"] },
-	{ date = "23-09-22", character = ["Нельсон Мандела", "Nelson Mandela"] },
-	{ date = "23-09-23", character = ["Жанна Д'Арк", "Joan of Arc"] },
-	{ date = "23-09-24", character = ["Анна Каренина", "Anna Karenina"] },
-	{ date = "23-09-25", character = ["Фрэнклин Рузвельт", "Franklin D. Roosevelt"] },
-	{ date = "23-09-26", character = ["Вильгельм Шекспир", "William Shakespeare"] },
-	{ date = "23-09-27", character = ["Елизавета I", "Elizabeth I"] },
-	{ date = "23-09-28", character = ["Луи Армстронг", "Louis Armstrong"] },
-	{ date = "23-09-29", character = ["Генри Форд", "Henry Ford"] },
+	{ date = "23-09-30", character = ["Альберт Эйнштейн", "Albert Einstein"] },
+	{ date = "23-10-01", character = ["Мартин Лютер Кинг", "Martin Luther King Jr."] },
+	{ date = "23-10-02", character = ["Махатма Ганди", "Mahatma Gandhi"] },
+	{ date = "23-10-03", character = ["Мария Кюри", "Marie Curie"] },
+	{ date = "23-10-04", character = ["Чарльз Дарвин", "Charles Darwin"] },
+	{ date = "23-10-05", character = ["Винсент ван Гог", "Vincent van Gogh"] },
+	{ date = "23-10-06", character = ["Моцарт", "Wolfgang Amadeus Mozart"] },
+	{ date = "23-10-07", character = ["Фридрих Ницше", "Friedrich Nietzsche"] },
+	{ date = "23-10-08", character = ["Агата Кристи", "Agatha Christie"] },
+	{ date = "23-10-09", character = ["Боб Марли", "Bob Marley"] },
+	{ date = "23-10-10", character = ["Майкл Джексон", "Michael Jackson"] },
+	{ date = "23-10-11", character = ["Стив Джобс", "Steve Jobs"] },
+	{ date = "23-10-12", character = ["Мать Тереза", "Mother Teresa"] },
+	{ date = "23-10-13", character = ["Оскар Уайльд", "Oscar Wilde"] },
+	{ date = "23-10-14", character = ["Бетховен", "Ludwig van Beethoven"] },
+	{ date = "23-10-15", character = ["Фрида Кало", "Frida Kahlo"] },
 ]
