@@ -1,61 +1,71 @@
 use config::CONFIG;
-
 use log::*;
-
 use async_openai::types::{
-    ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role,
+    ChatCompletionRequestMessage, ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role,
 };
 use async_openai::{config::OpenAIConfig, Client};
+use lazy_static::lazy_static;
+use std::collections::VecDeque;
+use tokio::sync::Mutex;
 
-pub async fn helper_question(question: String) -> String {
+lazy_static! {
+    static ref MESSAGE_HISTORY: Mutex<VecDeque<ChatCompletionRequestMessage>> = Mutex::new(VecDeque::new());
+}
+
+// Установите подходящий размер для вашего приложения
+const MAX_HISTORY_SIZE: usize = 10;
+
+pub async fn helper_question(question: String) -> Result<String, Box<dyn std::error::Error>> {
     let config = OpenAIConfig::new().with_api_key(CONFIG.clone().openai.openai_api_token);
 
-    // Получаем промпт для роли "ChatGPT" из конфигурации
+    let chatgpt_prompt = &CONFIG.openai.helper_prompt_template;
+    dbg!(chatgpt_prompt);
 
-    let chatgpt_prompt = CONFIG.clone().openai.helper_prompt_template;
-    dbg!(chatgpt_prompt.clone());
-    // Получаем максимальное количество токенов на один запрос к openai
-    let token_limit = CONFIG.openai.clone().gpt_tokens_per_request_limit;
+    let token_limit = CONFIG.openai.gpt_tokens_per_request_limit;
 
-    // Получаем промпт для вопроса от пользователя (аргумент функции)
     let user_prompt = question;
-    info!(
-        "Получен новый запрос от пользователя : {}",
-        &user_prompt.clone()
-    );
+    info!("Получен новый запрос от пользователя: {}", &user_prompt);
 
-    // Создаем клиента для работы с OpenAI API
     let client = Client::with_config(config);
 
-    // Формируем запрос на создание чат-подобной модели с указанными ролями и сообщениями
+    let mut history = MESSAGE_HISTORY.lock().await;
+
+    // Ограничиваем размер истории
+    if history.len() > MAX_HISTORY_SIZE {
+        history.pop_front(); // Удаляем самое старое сообщение
+    }
+
+    // Формирование запроса
     let request = CreateChatCompletionRequestArgs::default()
         .max_tokens(token_limit as u16)
         .model("gpt-4")
-        .messages([
-            // Сообщение с ролью "System" для установки контекста ассистента
-            ChatCompletionRequestMessageArgs::default()
-                .role(Role::System)
-                .content("You're a helpful bot in our chat room called E7")
-                .build()
-                .unwrap(),
-            // Сообщение с ролью "ChatGPT" и содержанием промпта для ChatGPT
-            ChatCompletionRequestMessageArgs::default()
-                .role(Role::Assistant) // Здесь ассистент играет роль ChatGPT
-                .content(chatgpt_prompt)
-                .build()
-                .unwrap(),
-            // Сообщение с ролью "User" и содержанием вопроса пользователя
-            ChatCompletionRequestMessageArgs::default()
-                .role(Role::User)
-                .content(&user_prompt)
-                .build()
-                .unwrap(),
-        ])
-        .build()
-        .unwrap();
+        .messages({
+            let mut msgs = history.iter().cloned().collect::<Vec<_>>();
+            msgs.push(
+                ChatCompletionRequestMessageArgs::default()
+                    .role(Role::System)
+                    .content(chatgpt_prompt)
+                    .build()?
+            );
+            msgs.push(
+                ChatCompletionRequestMessageArgs::default()
+                    .role(Role::User)
+                    .content(&user_prompt)
+                    .build()?
+            );
+            msgs
+        })
+        .build()?;
 
-    let response = client.chat().create(request).await.unwrap();
-    info!("Ответ от openai api : {:#?}", response);
+    let response = client.chat().create(request).await?;
 
-    response.choices[0].message.content.clone().unwrap()
+    // Добавление нового сообщения пользователя в историю
+    history.push_back(
+        ChatCompletionRequestMessageArgs::default()
+            .role(Role::User)
+            .content(user_prompt)
+            .build()?
+    );
+
+    Ok(response.choices[0].message.content.clone().ok_or("No content in response")?)
 }
