@@ -2,14 +2,13 @@
 // 1. Временные, те которые создаются каждый день.
 // 2. Постоянная база которая хранит в себе количество запросов к chatgpt4 у пользователей.
 
-
-use std::error::Error;
-use rusqlite::{Connection, named_params, params};
-use std::sync::{Arc};
-use tokio::sync::{Mutex};
+use crate::model::WinnerEntry;
 use log::{error, trace};
 use once_cell::sync::Lazy;
-use crate::model::WinnerEntry;
+use rusqlite::{named_params, params, Connection};
+use std::error::Error;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 pub type WinnersDbPool = Arc<Mutex<Connection>>;
 
@@ -29,7 +28,6 @@ pub static WINNERS_DB: Lazy<WinnersDbPool> = Lazy::new(|| {
     Arc::new(Mutex::new(connection))
 });
 
-
 pub fn try_add_winner(user: WinnerEntry, con: &Connection) -> Result<(), Box<dyn Error>> {
     let query = "INSERT INTO Winners (id, requests) VALUES (?, ?)";
 
@@ -41,15 +39,15 @@ pub fn try_add_winner(user: WinnerEntry, con: &Connection) -> Result<(), Box<dyn
             user.requests,
         ],
     )
-        .unwrap_or_else(|e| {
-            error!("Ошибка во время подготовки query : {e}");
-            panic!();
-        });
+    .unwrap_or_else(|e| {
+        error!("Ошибка во время подготовки query : {e}");
+        panic!();
+    });
 
     Ok(())
 }
 
-pub fn try_get_winner(id : u64, con: &Connection) -> Option<WinnerEntry> {
+pub fn try_get_winner(id: u64, con: &Connection) -> Option<WinnerEntry> {
     let query = "SELECT id, requests FROM Winners WHERE ID = ?";
 
     let mut stmt = con.prepare(query).unwrap_or_else(|e| {
@@ -60,7 +58,7 @@ pub fn try_get_winner(id : u64, con: &Connection) -> Option<WinnerEntry> {
     let result = stmt.query_row(params![id], |row| {
         Ok(WinnerEntry {
             id: row.get(0).expect("Failed to get id"),
-            requests: row.get(1).expect("Failed to get attempts")
+            requests: row.get(1).expect("Failed to get attempts"),
         })
     });
 
@@ -74,7 +72,6 @@ pub fn try_get_winner(id : u64, con: &Connection) -> Option<WinnerEntry> {
     }
 }
 
-
 pub fn update_winners_requests(
     connection: &Connection,
     user_id: u64,
@@ -85,7 +82,6 @@ pub fn update_winners_requests(
         user_id.clone(),
         attempts.clone()
     );
-
 
     connection
         .execute(

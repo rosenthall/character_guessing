@@ -17,5 +17,5 @@ pub struct WinnerEntry {
     // Айди в телеграме
     pub id: u64,
     // Количество оставшихся вопросов к chatgpt.
-    pub requests : u16
+    pub requests: u16,
 }

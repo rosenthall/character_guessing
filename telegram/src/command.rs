@@ -44,7 +44,7 @@ pub struct CommandContext<'a> {
     pub command_content: String,
     pub bot: &'a Bot,
     pub con: MutexGuard<'a, Connection>,
-    pub winnersdb_con : MutexGuard<'a, Connection>
+    pub winnersdb_con: MutexGuard<'a, Connection>,
 }
 
 //noinspection ALL
@@ -105,8 +105,8 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
         msg: msg.clone(),
         command_content: "".to_string(),
         bot: &bot,
-        con : con,
-        winnersdb_con : winners_con
+        con: con,
+        winnersdb_con: winners_con,
     };
 
     match cmd.clone() {
@@ -121,7 +121,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             crate::commands::answer::execute(context).await.unwrap();
 
             Ok(())
-        },
+        }
 
         Command::Question(cmd) => {
             let context = CommandContext {
@@ -133,7 +133,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             crate::commands::question::execute(context).await.unwrap();
 
             Ok(())
-        },
+        }
 
         Command::Gpt(cmd) => {
             let context = CommandContext {
@@ -145,7 +145,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             crate::commands::gpt::execute(context).await.unwrap();
 
             Ok(())
-        },
+        }
 
         Command::Requests => {
             crate::commands::requests::execute(context).await.unwrap();
@@ -153,12 +153,11 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
             Ok(())
         }
 
-
         Command::Winners => {
             crate::commands::winners::execute(context).await.unwrap();
 
             Ok(())
-        },
+        }
 
         Command::Info => {
             crate::commands::info::execute(context).await.unwrap();
