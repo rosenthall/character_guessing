@@ -19,10 +19,10 @@ pub struct TelegramConfig {
 pub struct OpenAIConfig {
     pub openai_api_token: String,
     pub character_tokens_per_request_limit: u32,
-    pub gpt_tokens_per_request_limit : u32,
+    pub gpt_tokens_per_request_limit: u32,
     pub default_prompt_template: String,
     pub helper_prompt_template: String,
-    pub prompt_blacklist_words : Vec<String>,
+    pub prompt_blacklist_words: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
