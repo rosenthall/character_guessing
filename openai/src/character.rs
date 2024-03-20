@@ -1,10 +1,11 @@
 // Importing necessary modules and packages
+use async_openai::{
+    config::OpenAIConfig,
+    types::{ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role},
+    Client,
+};
 use config::CONFIG;
 use log::*;
-use async_openai::types::{
-    ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role,
-};
-use async_openai::{config::OpenAIConfig, Client};
 
 // Function to handle a character question
 // This function sends a request to the OpenAI API and returns the response
@@ -16,11 +17,8 @@ pub async fn character_question(question: String) -> String {
     let character_names = CONFIG.calendar.try_get_daily_character_names().unwrap();
 
     // Format the prompt for the chatbot
-    let chatgpt_prompt = format!(
-        "{} {}",
-        CONFIG.clone().openai.default_prompt_template,
-        character_names[0]
-    );
+    let chatgpt_prompt =
+        format!("{} {}", CONFIG.clone().openai.default_prompt_template, character_names[0]);
 
     // Log the chatbot prompt
     dbg!(chatgpt_prompt.clone());
@@ -30,10 +28,7 @@ pub async fn character_question(question: String) -> String {
 
     // Get the user's prompt
     let user_prompt = question;
-    info!(
-        "Received a new request from the user: {}",
-        &user_prompt.clone()
-    );
+    info!("Received a new request from the user: {}", &user_prompt.clone());
 
     // Create a new client with the OpenAI configuration
     let client = Client::with_config(config);
@@ -46,22 +41,27 @@ pub async fn character_question(question: String) -> String {
             // Message with the "System" role to set the assistant's context
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::System)
-                .content("You are a historical character.You're trying to hide your name. You are responding in the language in which you're being asked..")
-                .build().unwrap(),
-
+                .content(
+                    "You are a historical character.You're trying to hide your name. You are \
+                     responding in the language in which you're being asked..",
+                )
+                .build()
+                .unwrap(),
             // Message with the "ChatGPT" role and the chatbot's prompt
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::Assistant) // Here the assistant plays the role of ChatGPT
                 .content(chatgpt_prompt)
-                .build().unwrap(),
-
+                .build()
+                .unwrap(),
             // Message with the "User" role and the user's question
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::User)
                 .content(&user_prompt)
-                .build().unwrap(),
+                .build()
+                .unwrap(),
         ])
-        .build().unwrap();
+        .build()
+        .unwrap();
 
     // Send the request and get the response
     let response = client.chat().create(request).await.unwrap();

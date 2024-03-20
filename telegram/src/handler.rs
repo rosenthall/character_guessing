@@ -1,8 +1,7 @@
 use config::CONFIG;
 use database::*;
 use log::info;
-use teloxide::prelude::*;
-use teloxide::Bot;
+use teloxide::{prelude::*, Bot};
 use tokio::sync::MutexGuard;
 
 use teloxide_macros::BotCommands;
@@ -14,10 +13,7 @@ use rusqlite::Connection;
 
 // Enum for different types of commands
 #[derive(BotCommands, Clone, Debug)]
-#[command(
-rename_rule = "lowercase",
-description = "These commands are supported:"
-)]
+#[command(rename_rule = "lowercase", description = "These commands are supported:")]
 pub enum Command {
     #[command(description = "Assume today's character.")]
     Answer(String),
@@ -65,11 +61,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
 
     let is_chat_in_whitelist = allowed_groups.contains(&msg.chat.clone().id.0);
     // Log the result of the whitelist check
-    info!(
-        "Group {} is in whitelist : {}",
-        msg.chat.clone().id.0,
-        is_chat_in_whitelist.clone()
-    );
+    info!("Group {} is in whitelist : {}", msg.chat.clone().id.0, is_chat_in_whitelist.clone());
 
     // If the chat is not in the whitelist, do not process the command.
     if !is_chat_in_whitelist {
@@ -92,15 +84,10 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
     // If the user does not exist in the database, add them
     if !is_user_exists_in_db {
         try_add_user(
-            UserDbEntry {
-                id: author.id.0,
-                attempts: 0,
-                is_won: false,
-                questions_quantity: 0,
-            },
+            UserDbEntry { id: author.id.0, attempts: 0, is_won: false, questions_quantity: 0 },
             &con,
         )
-            .unwrap()
+        .unwrap()
     }
 
     // Create a context for the command
@@ -110,7 +97,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
         msg: msg.clone(),
         command_content: "".to_string(),
         bot: &bot,
-        con: con,
+        con,
         winnersdb_con: winners_con,
     };
 
@@ -118,11 +105,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
     match cmd.clone() {
         Command::Answer(cmd) => {
             // Update the command context, changing only cmd
-            let context = CommandContext {
-                command_content: cmd,
-
-                ..context
-            };
+            let context = CommandContext { command_content: cmd, ..context };
 
             // Execute the answer command
             crate::commands::answer::execute(context).await.unwrap();
@@ -131,11 +114,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
         }
 
         Command::Question(cmd) => {
-            let context = CommandContext {
-                command_content: cmd,
-
-                ..context
-            };
+            let context = CommandContext { command_content: cmd, ..context };
 
             // Execute the question command
             crate::commands::question::execute(context).await.unwrap();
@@ -144,11 +123,7 @@ pub async fn handle_command(bot: Bot, msg: Message, cmd: Command) -> ResponseRes
         }
 
         Command::Gpt(cmd) => {
-            let context = CommandContext {
-                command_content: cmd,
-
-                ..context
-            };
+            let context = CommandContext { command_content: cmd, ..context };
 
             // Execute the GPT command
             crate::commands::gpt::execute(context).await.unwrap();

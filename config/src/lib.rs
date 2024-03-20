@@ -4,8 +4,7 @@ use error::ConfigError;
 use chrono::prelude::*;
 use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
-use std::fs;
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 use toml::from_str;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

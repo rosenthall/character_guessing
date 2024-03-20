@@ -3,8 +3,7 @@ use crate::model::WinnerEntry;
 use log::{error, trace};
 use once_cell::sync::Lazy;
 use rusqlite::{named_params, params, Connection};
-use std::error::Error;
-use std::sync::Arc;
+use std::{error::Error, sync::Arc};
 use tokio::sync::Mutex;
 
 // Type alias for a database pool

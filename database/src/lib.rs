@@ -3,14 +3,14 @@ pub mod init;
 pub mod model;
 pub mod winners;
 // Importing necessary modules and packages
-use model::UserDbEntry;
-use std::error::Error;
-use std::result::Result;
 use log::{error, trace};
+use model::UserDbEntry;
 use rusqlite::{params, Connection};
+use std::{error::Error, result::Result};
 
 // Function to check if a user exists in the database
-// If the user exists, it returns a UserDbEntry struct, otherwise it returns None
+// If the user exists, it returns a UserDbEntry struct, otherwise it returns
+// None
 pub fn check_user(id: u64, con: &Connection) -> Option<model::UserDbEntry> {
     // SQL query to select a user by ID
     let query = "SELECT ID, attempts, is_won, questions_quantity FROM Users WHERE ID = ?";
@@ -46,16 +46,10 @@ pub fn check_user(id: u64, con: &Connection) -> Option<model::UserDbEntry> {
 // Function to get a list of all users who have won today
 pub fn get_winning_user_ids(con: &Connection) -> Option<Vec<u64>> {
     // Prepare the SQL statement
-    let mut query = con
-        .prepare("SELECT ID FROM Users WHERE is_won = 1")
-        .unwrap();
+    let mut query = con.prepare("SELECT ID FROM Users WHERE is_won = 1").unwrap();
 
     // Execute the query and collect the result into a vector
-    let user_ids = query
-        .query_map([], |row| row.get(0))
-        .unwrap()
-        .filter_map(Result::ok)
-        .collect();
+    let user_ids = query.query_map([], |row| row.get(0)).unwrap().filter_map(Result::ok).collect();
 
     Some(user_ids)
 }
@@ -76,10 +70,10 @@ pub fn try_add_user(user: UserDbEntry, con: &Connection) -> Result<(), Box<dyn E
             user.questions_quantity,
         ],
     )
-        .unwrap_or_else(|e| {
-            error!("Error preparing query: {e}");
-            panic!();
-        });
+    .unwrap_or_else(|e| {
+        error!("Error preparing query: {e}");
+        panic!();
+    });
 
     Ok(())
 }
@@ -98,10 +92,7 @@ pub fn update_attempts(
 
     // Execute the SQL update statement
     connection
-        .execute(
-            "UPDATE users SET attempts = ?1 WHERE id = ?2",
-            [attempts as i64, user_id as i64],
-        )
+        .execute("UPDATE users SET attempts = ?1 WHERE id = ?2", [attempts as i64, user_id as i64])
         .unwrap();
     Ok(())
 }
@@ -114,10 +105,7 @@ pub fn update_is_won(
 ) -> Result<(), &'static dyn Error> {
     // Execute the SQL update statement
     connection
-        .execute(
-            "UPDATE users SET is_won = ?1 WHERE id = ?2",
-            [is_won as i64, user_id as i64],
-        )
+        .execute("UPDATE users SET is_won = ?1 WHERE id = ?2", [is_won as i64, user_id as i64])
         .unwrap();
     Ok(())
 }

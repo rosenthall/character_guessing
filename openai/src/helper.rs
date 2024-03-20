@@ -1,9 +1,12 @@
 // Importing necessary modules and packages
-use async_openai::types::{
-    ChatCompletionRequestMessage, ChatCompletionRequestMessageArgs,
-    CreateChatCompletionRequestArgs, Role,
+use async_openai::{
+    config::OpenAIConfig,
+    types::{
+        ChatCompletionRequestMessage, ChatCompletionRequestMessageArgs,
+        CreateChatCompletionRequestArgs, Role,
+    },
+    Client,
 };
-use async_openai::{config::OpenAIConfig, Client};
 use config::CONFIG;
 use lazy_static::lazy_static;
 use log::*;
@@ -39,9 +42,7 @@ pub async fn helper_question(question: String) -> Result<String, Box<dyn std::er
     add_init_message(
         ChatCompletionRequestMessageArgs::default()
             .role(Role::System)
-            .content(
-                "You're a helpful bot in our chat room called \"Nyagpt\", you are catgirl.",
-            )
+            .content("You're a helpful bot in our chat room called \"Nyagpt\", you are catgirl.")
             .build()
             .unwrap(),
     )
@@ -105,9 +106,5 @@ pub async fn helper_question(question: String) -> Result<String, Box<dyn std::er
     );
 
     // Return the content of the response
-    Ok(response.choices[0]
-        .message
-        .content
-        .clone()
-        .ok_or("No content in response")?)
+    Ok(response.choices[0].message.content.clone().ok_or("No content in response")?)
 }

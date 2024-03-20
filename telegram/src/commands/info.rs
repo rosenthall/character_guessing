@@ -1,6 +1,5 @@
 use crate::handler::CommandContext;
-use teloxide::payloads::SendMessageSetters;
-use teloxide::requests::Requester;
+use teloxide::{payloads::SendMessageSetters, requests::Requester};
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     let _ = ctx

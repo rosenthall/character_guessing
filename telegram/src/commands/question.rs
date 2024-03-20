@@ -1,10 +1,8 @@
 use crate::handler::CommandContext;
 use config::CONFIG;
-use log::{info, trace};
-use teloxide::payloads::SendMessageSetters;
-use teloxide::requests::Requester;
 use database::update_questions_quantity;
-
+use log::{info, trace};
+use teloxide::{payloads::SendMessageSetters, requests::Requester};
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     info!("New question : {}", ctx.command_content);
@@ -27,8 +25,8 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         ctx.bot
             .send_message(
                 ctx.msg.chat.id,
-                "Извини, но ты уже задал свои 3 вопроса сегодня!\
-                Возвращайся завтра и попробуй угадать следуйщего персонажа.",
+                "Извини, но ты уже задал свои 3 вопроса сегодня!Возвращайся завтра и попробуй \
+                 угадать следуйщего персонажа.",
             )
             .reply_to_message_id(ctx.msg.id)
             .await
@@ -46,7 +44,8 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         ctx.bot
             .send_message(
                 ctx.msg.chat.id,
-                "Извини, в твоём сообщении есть запрещенные слова!\nПопробуй перефразировать или не задавать прямых вопросов касающихся имени персонажа!",
+                "Извини, в твоём сообщении есть запрещенные слова!\nПопробуй перефразировать или \
+                 не задавать прямых вопросов касающихся имени персонажа!",
             )
             .reply_to_message_id(ctx.msg.id)
             .await
@@ -61,10 +60,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
 
     // Check if the response contains any of the names of the characters for the day
     let names = CONFIG.calendar.try_get_daily_character_names().unwrap();
-    if names
-        .iter()
-        .any(|name| ai_answer.to_lowercase().contains(&name.to_lowercase()))
-    {
+    if names.iter().any(|name| ai_answer.to_lowercase().contains(&name.to_lowercase())) {
         // If a name is found, censor it
         for name in &names {
             ai_answer = ai_answer.replace(name, "[ИМЯ ПЕРСОНАЖА]");
@@ -72,11 +68,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     }
 
     // Send the AI's response to the user
-    let _ = ctx
-        .bot
-        .send_message(ctx.msg.chat.id, ai_answer)
-        .reply_to_message_id(ctx.msg.id)
-        .await;
+    let _ = ctx.bot.send_message(ctx.msg.chat.id, ai_answer).reply_to_message_id(ctx.msg.id).await;
 
     // Increase the number of questions asked by the user by 1
     trace!(
@@ -88,6 +80,6 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         ctx.db_entry_user.id,
         ctx.db_entry_user.questions_quantity + 1,
     )
-        .unwrap();
+    .unwrap();
     Ok(())
 }

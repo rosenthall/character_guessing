@@ -33,7 +33,8 @@ trait ControlDatabase {
     async fn get_connection(&self) -> MutexGuard<Connection>;
 
     // Function to update the current connection to the database,
-    // in particular, it sets a new date and creates a new file if the date has changed
+    // in particular, it sets a new date and creates a new file if the date has
+    // changed
     async fn update(&mut self);
 }
 
@@ -74,9 +75,7 @@ impl ControlDatabase for DatabaseHandler {
 }
 
 // Static variable for the database handler
-pub static DATABASE_HANDLER: Lazy<DatabaseHandler> = Lazy::new(|| {
-    DatabaseHandler::init()
-});
+pub static DATABASE_HANDLER: Lazy<DatabaseHandler> = Lazy::new(|| DatabaseHandler::init());
 
 // Function to update the database connection
 pub(crate) async fn update_db_connection(con: Connection) {

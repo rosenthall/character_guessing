@@ -1,9 +1,7 @@
-use rusqlite::{params, Connection};
-use std::result::Result;
-use std::time::Duration;
-use crate::control;
-use crate::control::update_db_connection;
+use crate::{control, control::update_db_connection};
 use log::*;
+use rusqlite::{params, Connection};
+use std::{result::Result, time::Duration};
 
 // Creates a new database and table
 pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
@@ -21,10 +19,12 @@ pub fn create_database_and_table(date: &str) -> Result<Connection, ()> {
                   ID INTEGER PRIMARY KEY NOT NULL,
                   attempts INTEGER CHECK (attempts >= 0 AND attempts <= 5),
                   is_won BOOLEAN,
-                  questions_quantity INTEGER CHECK (questions_quantity >= 0 AND questions_quantity <= 3)
+                  questions_quantity INTEGER CHECK (questions_quantity >= 0 AND questions_quantity \
+         <= 3)
                   )",
         params![],
-    ).unwrap_or_else(|e| {
+    )
+    .unwrap_or_else(|e| {
         error!("Error: {e:#?}");
         panic!();
     });
@@ -44,7 +44,7 @@ pub async fn update_db_each_day_service() {
             let new_db = create_database_and_table(&formatted_date).unwrap();
             update_db_connection(new_db).await;
         })
-            .await
-            .unwrap();
+        .await
+        .unwrap();
     }
 }

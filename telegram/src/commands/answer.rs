@@ -1,20 +1,19 @@
 use crate::CommandContext;
 use config::CONFIG;
-use std::ops::Mul;
-use std::result::Result;
-use teloxide::payloads::SendMessageSetters;
-use teloxide::prelude::Requester;
+use std::{ops::Mul, result::Result};
+use teloxide::{payloads::SendMessageSetters, prelude::Requester};
 
-use database::model::WinnerEntry;
-use database::winners::{try_add_winner, try_get_winner, update_winners_requests};
+use database::{
+    model::WinnerEntry,
+    winners::{try_add_winner, try_get_winner, update_winners_requests},
+};
 use strsim::normalized_damerau_levenshtein;
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
-    ctx.bot
-        .delete_message(ctx.msg.chat.id, ctx.msg.id)
-        .await
-        .unwrap();
+    // Delete the user's message
+    ctx.bot.delete_message(ctx.msg.chat.id, ctx.msg.id).await.unwrap();
 
+    // If the user has already won, send a message indicating this
     if ctx.db_entry_user.is_won {
         let _ = ctx
             .bot
@@ -22,23 +21,21 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                 ctx.msg.chat.id,
                 &format!(
                     "{}, ты уже победил сегодня!",
-                    ctx.telegram_user
-                        .mention()
-                        .unwrap_or(ctx.telegram_user.first_name)
+                    ctx.telegram_user.mention().unwrap_or(ctx.telegram_user.first_name)
                 ),
             )
             .await;
         return Ok(());
     }
 
-    //Если человек попытался угадать больше 5 раз - отказываем.
+    // If the user has exceeded their guess attempts, send a message indicating this
     if ctx.db_entry_user.attempts >= 5 {
         let _ = ctx
             .bot
             .send_message(
                 ctx.msg.chat.id,
-                "Извини, но ты уже сделал 5 попыток отгадать персонажа сегодня!\
-                Возвращайся завтра и попробуй угадать следуйщего персонажа.",
+                "Извини, но ты уже сделал 5 попыток отгадать персонажа сегодня!Возвращайся завтра \
+                 и попробуй угадать следуйщего персонажа.",
             )
             .reply_to_message_id(ctx.msg.id)
             .await
@@ -46,25 +43,25 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         return Ok(());
     }
 
-    // Получаем список имен сегодняшнего персонажа
+    // Get the list of the character's names for the day
     let character_names = CONFIG.calendar.try_get_daily_character_names().unwrap();
 
-    // Приводим в нижний регистр
-    let character_names = character_names
-        .iter()
-        .map(|i| i.to_lowercase())
-        .collect::<Vec<String>>();
+    // Convert the names to lowercase
+    let character_names = character_names.iter().map(|i| i.to_lowercase()).collect::<Vec<String>>();
 
     for name in character_names {
-        // Сравниваем наши имена в нижнем регистре и ответ пользователя, после чего умножаем результат на 100 для более удобного сравнения
-
+        // Compare the user's guess to the character's names
+        // Multiply the result by 100 for easier comparison
         let res: u8 = normalized_damerau_levenshtein(&ctx.command_content, &name.to_lowercase())
             .mul(100.0) as u8;
+
+        // If the similarity is between 60 and 100, the user wins
         return match res {
-            // От 60 до 100 схожести означает победу.
             60..=100 => {
+                // Debug print the result
                 dbg!(res.clone());
 
+                // Send a message indicating that the user has guessed the character
                 let _ = ctx
                     .bot
                     .send_message(
@@ -77,23 +74,22 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                         ),
                     )
                     .await;
-                // Обновляем показания в сегодняшней тоже.
+
+                // Update the user's win status in the database
                 let _ = database::update_is_won(&ctx.con, ctx.telegram_user.id.0, true);
 
-                // Ищем пользователя в постоянной базе данных. Если его там нет - добавляем.
+                // Try to get the user from the winners database
                 let winner_entry =
                     try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con)
                         .or_else(|| {
-                            // Добавляем если такого поля нет.
+                            // If the user does not exist in the winners database, add them
                             try_add_winner(
-                                WinnerEntry {
-                                    id: ctx.telegram_user.id.0,
-                                    requests: 0,
-                                },
+                                WinnerEntry { id: ctx.telegram_user.id.0, requests: 0 },
                                 &ctx.winnersdb_con,
                             )
                             .unwrap();
 
+                            // Get the newly added user from the winners database
                             Some(
                                 try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con)
                                     .unwrap(),
@@ -101,16 +97,18 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                         })
                         .unwrap();
 
-                // Добавляем ему +3 запроса (сообственно награда)
+                // Add 3 requests to the user's total in the winners database
                 let _ = update_winners_requests(
                     &ctx.winnersdb_con,
                     ctx.telegram_user.id.0,
-                    winner_entry.requests + 3
+                    winner_entry.requests + 3,
                 );
 
                 Ok(())
             }
+            // If the similarity is less than 60, the user's guess is incorrect
             _ => {
+                // Send a message indicating that the user's guess was incorrect
                 let _ = ctx
                     .bot
                     .send_message(
