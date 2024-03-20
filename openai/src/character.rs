@@ -1,55 +1,61 @@
+// Importing necessary modules and packages
 use config::CONFIG;
-
 use log::*;
-
 use async_openai::types::{
     ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role,
 };
 use async_openai::{config::OpenAIConfig, Client};
 
+// Function to handle a character question
+// This function sends a request to the OpenAI API and returns the response
 pub async fn character_question(question: String) -> String {
+    // Initialize the OpenAI configuration
     let config = OpenAIConfig::new().with_api_key(CONFIG.clone().openai.openai_api_token);
 
-    // Получаем промпт для роли "ChatGPT" из конфигурации
-
+    // Get the character names for the day
     let character_names = CONFIG.calendar.try_get_daily_character_names().unwrap();
+
+    // Format the prompt for the chatbot
     let chatgpt_prompt = format!(
         "{} {}",
         CONFIG.clone().openai.default_prompt_template,
         character_names[0]
     );
+
+    // Log the chatbot prompt
     dbg!(chatgpt_prompt.clone());
-    // Получаем максимальное количество токенов на один запрос к openai
+
+    // Get the maximum number of tokens for the request
     let token_limit = CONFIG.openai.clone().character_tokens_per_request_limit;
 
-    // Получаем промпт для вопроса от пользователя (аргумент функции)
+    // Get the user's prompt
     let user_prompt = question;
     info!(
-        "Получен новый запрос от пользователя : {}",
+        "Received a new request from the user: {}",
         &user_prompt.clone()
     );
 
-    // Создаем клиента для работы с OpenAI API
+    // Create a new client with the OpenAI configuration
     let client = Client::with_config(config);
 
-    // Формируем запрос на создание чат-подобной модели с указанными ролями и сообщениями
+    // Form the request
     let request = CreateChatCompletionRequestArgs::default()
         .max_tokens(token_limit as u16)
         .model("gpt-4")
         .messages([
-            // Сообщение с ролью "System" для установки контекста ассистента
+            // Message with the "System" role to set the assistant's context
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::System)
                 .content("You are a historical character.You're trying to hide your name. You are responding in the language in which you're being asked..")
                 .build().unwrap(),
 
-            // Сообщение с ролью "ChatGPT" и содержанием промпта для ChatGPT
+            // Message with the "ChatGPT" role and the chatbot's prompt
             ChatCompletionRequestMessageArgs::default()
-                .role(Role::Assistant) // Здесь ассистент играет роль ChatGPT
+                .role(Role::Assistant) // Here the assistant plays the role of ChatGPT
                 .content(chatgpt_prompt)
                 .build().unwrap(),
 
-            // Сообщение с ролью "User" и содержанием вопроса пользователя
+            // Message with the "User" role and the user's question
             ChatCompletionRequestMessageArgs::default()
                 .role(Role::User)
                 .content(&user_prompt)
@@ -57,8 +63,10 @@ pub async fn character_question(question: String) -> String {
         ])
         .build().unwrap();
 
+    // Send the request and get the response
     let response = client.chat().create(request).await.unwrap();
-    info!("Ответ от openai api : {:#?}", response);
+    info!("Response from openai api: {:#?}", response);
 
+    // Return the content of the response
     response.choices[0].message.content.clone().unwrap()
 }

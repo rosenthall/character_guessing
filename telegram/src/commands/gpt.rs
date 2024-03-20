@@ -1,5 +1,5 @@
 use chrono::Local;
-use crate::command::CommandContext;
+use crate::handler::CommandContext;
 use database::model::WinnerEntry;
 use database::winners::*;
 use log::info;
@@ -9,10 +9,10 @@ use teloxide::requests::Requester;
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     info!("New gpt question : {}", ctx.command_content);
 
-    // получаем доступ к записи о пользователе который вызвал комманду. Если записи нет - добавляем его туда.
+    // Attempt to get the winner from the database
     let winner_entry = try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con)
         .or_else(|| {
-            // Добавляем если такого поля нет.
+            // If the winner does not exist, add a new winner to the database
             try_add_winner(
                 WinnerEntry {
                     id: ctx.telegram_user.id.0,
@@ -20,13 +20,14 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                 },
                 &ctx.winnersdb_con,
             )
-            .unwrap();
+                .unwrap();
 
+            // Retrieve the newly added winner
             Some(try_get_winner(ctx.telegram_user.clone().id.0, &ctx.winnersdb_con).unwrap())
         })
         .unwrap();
 
-    // Если у пользователя есть запросы - сообственно делаем запрос к openai.
+    // If the user has requests left, send the question to the AI and return the AI's response
     if winner_entry.requests != 0 {
         let caller =
             if ctx.telegram_user.full_name().is_empty() || ctx.telegram_user.full_name() == "" {
@@ -55,24 +56,24 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
             .await
             .map_err(|e| eprintln!("Error while interacting with openai api : {:?}", e));
 
-            let _ = ctx
-                .bot
-                .send_message(ctx.msg.chat.id, ai_respone.unwrap())
-                .reply_to_message_id(ctx.msg.id)
-                .await;
+        let _ = ctx
+            .bot
+            .send_message(ctx.msg.chat.id, ai_respone.unwrap())
+            .reply_to_message_id(ctx.msg.id)
+            .await;
 
-        //Отнимаем у этого пользователя 1 запрос.
+        // Decrease the number of requests left for the user by 1
         update_winners_requests(
             &ctx.winnersdb_con,
             winner_entry.id,
             winner_entry.requests - 1,
         )
-        .unwrap();
+            .unwrap();
 
         return Ok(());
     }
 
-    //В случае если оставшихся запросов нет - отправляем сообщение об этом.
+    // If the user has no requests left, send a message to the user indicating this
     let _ = ctx
         .bot
         .send_message(

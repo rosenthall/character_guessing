@@ -60,6 +60,7 @@ pub struct Config {
     pub openai: OpenAIConfig,
     pub calendar: CalendarConfig,
 }
+
 impl Config {
     fn load_from_current_path() -> Result<Config, ConfigError> {
         let dir = std::env::current_dir()?;

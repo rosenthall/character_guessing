@@ -1,21 +1,15 @@
-// Нужно для хранения пользователей в течении дня.
+// UserDbEntry Stores daily user data.
 #[derive(Debug)]
 pub struct UserDbEntry {
-    // Соответствует айди пользователя в телеграме
-    pub id: u64,
-    // Количество попыток
-    pub attempts: u8,
-    // Смог ли он победить(учитываются все попытки)
-    pub is_won: bool,
-    // Количество вопросов
-    pub questions_quantity: u8,
+    pub id: u64, // User's ID in Telegram.
+    pub attempts: u8, // Number of attempts made by the user.
+    pub is_won: bool, // Indicates if the user has won.
+    pub questions_quantity: u8, // Number of questions asked.
 }
 
-// Нужно для постоянного хранения победителей и их запаса вопросов к Chatgpt
+// WinnerEntry Stores winners and their remaining ChatGPT questions.
 #[derive(Debug)]
 pub struct WinnerEntry {
-    // Айди в телеграме
-    pub id: u64,
-    // Количество оставшихся вопросов к chatgpt.
-    pub requests: u16,
+    pub id: u64, // User's ID in Telegram.
+    pub requests: u16, // Number of remaining questions for ChatGPT.
 }

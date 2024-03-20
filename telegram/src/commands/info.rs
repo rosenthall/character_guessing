@@ -1,4 +1,4 @@
-use crate::command::CommandContext;
+use crate::handler::CommandContext;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::requests::Requester;
 

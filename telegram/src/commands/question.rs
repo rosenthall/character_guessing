@@ -1,17 +1,15 @@
-use crate::command::CommandContext;
+use crate::handler::CommandContext;
 use config::CONFIG;
 use log::{info, trace};
 use teloxide::payloads::SendMessageSetters;
 use teloxide::requests::Requester;
-
 use database::update_questions_quantity;
 
-//noinspection ALL
 
 pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     info!("New question : {}", ctx.command_content);
 
-    // Минимальная длинна вопроса. Если вопрос короче 5 символов, то и отвечать смысла нет.
+    // Check if the question is too short
     if ctx.command_content.len() <= 5 {
         ctx.bot
             .send_message(
@@ -24,7 +22,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         return Ok(());
     }
 
-    //Если человек уже задал больше трех вопросов - отказываем.
+    // Check if the user has already asked more than three questions
     if ctx.db_entry_user.questions_quantity >= 3 {
         ctx.bot
             .send_message(
@@ -38,7 +36,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         return Ok(());
     }
 
-    // Если в вопросе есть запрещенные слова - отказываем.
+    // Check if the question contains any blacklisted words
     if CONFIG
         .openai
         .prompt_blacklist_words
@@ -57,27 +55,30 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         return Ok(());
     }
 
+    // Send the question to the AI and get the response
     let mut ai_answer = openai::character_question(ctx.command_content).await;
     info!("AI ANSWER : {}", ai_answer.clone());
 
-    // Проверяем сообщение на наличие одного из сегодняшних имен. Если оно есть - цензурим.
+    // Check if the response contains any of the names of the characters for the day
     let names = CONFIG.calendar.try_get_daily_character_names().unwrap();
     if names
         .iter()
         .any(|name| ai_answer.to_lowercase().contains(&name.to_lowercase()))
     {
+        // If a name is found, censor it
         for name in &names {
             ai_answer = ai_answer.replace(name, "[ИМЯ ПЕРСОНАЖА]");
         }
     }
 
+    // Send the AI's response to the user
     let _ = ctx
         .bot
         .send_message(ctx.msg.chat.id, ai_answer)
         .reply_to_message_id(ctx.msg.id)
         .await;
 
-    //Увеличиваем количество заданных вопросов на 1
+    // Increase the number of questions asked by the user by 1
     trace!(
         "Увеличенно количество заданных вопросов на 1 для пользователя : {}",
         ctx.telegram_user.id
@@ -87,6 +88,6 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
         ctx.db_entry_user.id,
         ctx.db_entry_user.questions_quantity + 1,
     )
-    .unwrap();
+        .unwrap();
     Ok(())
 }
