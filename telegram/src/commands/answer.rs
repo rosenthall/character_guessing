@@ -49,6 +49,8 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
     // Convert the names to lowercase
     let character_names = character_names.iter().map(|i| i.to_lowercase()).collect::<Vec<String>>();
 
+    let mut result = Ok(());
+
     for name in character_names {
         // Compare the user's guess to the character's names
         // Multiply the result by 100 for easier comparison
@@ -56,11 +58,8 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
             .mul(100.0) as u8;
 
         // If the similarity is between 60 and 100, the user wins
-        return match res {
+        match res {
             60..=100 => {
-                // Debug print the result
-                dbg!(res.clone());
-
                 // Send a message indicating that the user has guessed the character
                 let _ = ctx
                     .bot
@@ -104,7 +103,8 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                     winner_entry.requests + 3,
                 );
 
-                Ok(())
+                result = Ok(());
+                break;
             }
             // If the similarity is less than 60, the user's guess is incorrect
             _ => {
@@ -121,10 +121,10 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
                         ),
                     )
                     .await;
-                Ok(())
+                result = Ok(());
             }
         };
     }
 
-    Ok(())
+    result
 }

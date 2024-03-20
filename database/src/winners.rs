@@ -36,14 +36,7 @@ pub fn try_add_winner(user: WinnerEntry, con: &Connection) -> Result<(), Box<dyn
     let query = "INSERT INTO Winners (id, requests) VALUES (?, ?)";
 
     // Execute the query with the provided parameters
-    con.execute(
-        query,
-        params![
-            user.id as u64, // Assume that the ID field in the database is of type INTEGER
-            user.requests,
-        ],
-    )
-    .unwrap_or_else(|e| {
+    con.execute(query, params![user.id, user.requests,]).unwrap_or_else(|e| {
         error!("Error preparing query: {e}");
         panic!();
     });

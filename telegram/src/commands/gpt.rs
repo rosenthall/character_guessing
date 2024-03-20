@@ -29,15 +29,7 @@ pub async fn execute(ctx: CommandContext<'_>) -> Result<(), ()> {
             if ctx.telegram_user.full_name().is_empty() || ctx.telegram_user.full_name() == "" {
                 format!("({:?})", ctx.telegram_user.mention().is_none().then_some("(Anonymous)"))
             } else {
-                let result = ctx
-                    .telegram_user
-                    .full_name()
-                    .eq(&".".to_string())
-                    .then_some("(Принтер)")
-                    .unwrap_or(&format!("({})", &*ctx.telegram_user.full_name()))
-                    .to_string();
-
-                result
+                format!("({})", &*ctx.telegram_user.full_name()).to_string()
             };
 
         let formatted_question =

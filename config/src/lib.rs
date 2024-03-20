@@ -4,7 +4,7 @@ use error::ConfigError;
 use chrono::prelude::*;
 use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
-use std::{fs, path::PathBuf};
+use std::fs;
 use toml::from_str;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -62,8 +62,7 @@ pub struct Config {
 
 impl Config {
     fn load_from_current_path() -> Result<Config, ConfigError> {
-        let dir = std::env::current_dir()?;
-        let mut config_path = PathBuf::from(dir);
+        let mut config_path = std::env::current_dir()?;
         config_path.push("config.toml");
 
         let config_text = fs::read(config_path)?;

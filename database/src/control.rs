@@ -60,9 +60,7 @@ impl ControlDatabase for DatabaseHandler {
 
     // Function to get a connection to the database
     async fn get_connection(&self) -> MutexGuard<Connection> {
-        let connection = self.lock().await;
-
-        connection
+        self.lock().await
     }
 
     // Function to update the current connection to the database
@@ -75,7 +73,7 @@ impl ControlDatabase for DatabaseHandler {
 }
 
 // Static variable for the database handler
-pub static DATABASE_HANDLER: Lazy<DatabaseHandler> = Lazy::new(|| DatabaseHandler::init());
+pub static DATABASE_HANDLER: Lazy<DatabaseHandler> = Lazy::new(DatabaseHandler::init);
 
 // Function to update the database connection
 pub(crate) async fn update_db_connection(con: Connection) {

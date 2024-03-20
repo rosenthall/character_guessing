@@ -61,19 +61,11 @@ pub fn try_add_user(user: UserDbEntry, con: &Connection) -> Result<(), Box<dyn E
     let query = "INSERT INTO Users (ID, attempts, is_won, questions_quantity) VALUES (?, ?, ?, ?)";
 
     // Execute the query with the provided parameters
-    con.execute(
-        query,
-        params![
-            user.id as u64, // Assume that the ID field in the database is of type INTEGER
-            user.attempts,
-            user.is_won,
-            user.questions_quantity,
-        ],
-    )
-    .unwrap_or_else(|e| {
-        error!("Error preparing query: {e}");
-        panic!();
-    });
+    con.execute(query, params![user.id, user.attempts, user.is_won, user.questions_quantity,])
+        .unwrap_or_else(|e| {
+            error!("Error preparing query: {e}");
+            panic!();
+        });
 
     Ok(())
 }
