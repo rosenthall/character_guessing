@@ -5,7 +5,6 @@ use chrono::prelude::*;
 use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
 use std::fs;
-use std::path::PathBuf;
 use toml::from_str;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -19,10 +18,10 @@ pub struct TelegramConfig {
 pub struct OpenAIConfig {
     pub openai_api_token: String,
     pub character_tokens_per_request_limit: u32,
-    pub gpt_tokens_per_request_limit : u32,
+    pub gpt_tokens_per_request_limit: u32,
     pub default_prompt_template: String,
     pub helper_prompt_template: String,
-    pub prompt_blacklist_words : Vec<String>,
+    pub prompt_blacklist_words: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -60,10 +59,10 @@ pub struct Config {
     pub openai: OpenAIConfig,
     pub calendar: CalendarConfig,
 }
+
 impl Config {
     fn load_from_current_path() -> Result<Config, ConfigError> {
-        let dir = std::env::current_dir()?;
-        let mut config_path = PathBuf::from(dir);
+        let mut config_path = std::env::current_dir()?;
         config_path.push("config.toml");
 
         let config_text = fs::read(config_path)?;

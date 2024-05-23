@@ -1,10 +1,10 @@
-// command module contains some abstraction to make commands creation easier
-mod command;
+// handler module contains some abstraction to make commands creation easier
+mod handler;
 
 // commands module
 mod commands;
 
-use command::*;
+use handler::*;
 use log::info;
 
 use teloxide::prelude::*;
